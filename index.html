@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Financial Projections</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+        integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="css/main.css">
+</head>
+
+<body class="container">
+    <main class="content-box">
+        <form class="m-2">
+            <section id="tab-1">
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="first-name">First Name</label>
+                        <input type="text" name="first-name" class="form-control form-control-sm" id="first-name"
+                            placeholder="First Name">
+                    </div>
+                    <div class="form-group col">
+                        <label for="last-name">Last Name</label>
+                        <input type="text" name="last-name" class="form-control form-control-sm" id="last-name"
+                            placeholder="Last Name">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="email">Email Address</label>
+                        <input type="text" name="email" class="form-control form-control-sm" id="email"
+                            placeholder="Please provide your email address">
+                    </div>
+                </div>
+            </section>
+            <section id="tab-2" class="hide">
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="income-1">Income</label>
+                        <input type="text" name="income-1" class="form-control form-control-sm" id="income-1"
+                            placeholder="Income">
+                    </div>
+                    <div class="form-group col">
+                        <label for="income-1-freq">Frequency</label>
+                        <select class="custom-select custom-select-sm" required>
+                            <option value="">Please select frequency</option>
+                            <option value="7">Every 1 week</option>
+                            <option value="14">Every 2 weeks</option>
+                            <option value="28">Every 4 weeks</option>
+                            <option value="30">Every 1 month</option>
+                            <option value="60">Every 2 months</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+            <section id="tab-3" class="hide">
+                <div class="form-row">
+                    <div class="form-group col">
+                        <label for="outgoing-1">Outgoings</label>
+                        <input type="text" name="outgoing-1" class="form-control form-control-sm" id="outgoing-1"
+                            placeholder="Outgoings">
+                    </div>
+                </div>
+            </section>
+            <section>
+                <div class="form-group">
+                    <a class="btn btn-primary hide" id="prev-btn" href="#" onclick="navigateTabs('prev')">Previous</a>
+                    <a class="btn btn-primary" id="next-btn" href="#" onclick="navigateTabs('next');">Next</a>
+                </div>
+            </section>
+        </form>
+    </main>
+
+
+
+
+    <script src="js/main.js"></script>
+
+</body>
+
+</html>
