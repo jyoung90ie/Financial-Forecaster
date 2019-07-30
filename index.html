@@ -9,12 +9,13 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
     <link rel="stylesheet" href="css/main.css">
+    <script src="https://kit.fontawesome.com/6cef40e88b.js"></script>
 </head>
 
 <body class="container">
     <main class="content-box">
         <form class="m-2">
-            <section id="tab-1">
+            <section id="tab-1" class="hide">
                 <div class="form-row">
                     <div class="form-group col">
                         <label for="first-name">First Name</label>
@@ -35,16 +36,26 @@
                     </div>
                 </div>
             </section>
-            <section id="tab-2" class="hide">
+            <section id="tab-2">
+                <h2>Income(s)</h2>
                 <div class="form-row">
-                    <div class="form-group col">
-                        <label for="income-1">Income</label>
-                        <input type="text" name="income-1" class="form-control form-control-sm" id="income-1"
-                            placeholder="Income">
+                    <div class="col-3">Name</div>
+                    <div class="col-3">Amount</div>
+                    <div class="col-4">Frequency</div>
+                    <div class="col-2"></div>
+                </div>
+                <div class="form-row" id="income-fields-1">
+                    <div class="form-group col-3">
+                        <input type="text" name="income-name-1" class="form-control form-control-sm" id="income-name-1"
+                            placeholder="Name">
                     </div>
-                    <div class="form-group col">
-                        <label for="income-1-freq">Frequency</label>
-                        <select class="custom-select custom-select-sm" required>
+                    <div class="form-group col-3">
+                        <input type="text" name="income-amount-1" class="form-control form-control-sm"
+                            id="income-amount-1" placeholder="Amount">
+                    </div>
+                    <div class="form-group col-4">
+                        <select class="custom-select custom-select-sm" name="income-frequency-1" id="income-frequency-1"
+                            required>
                             <option value="">Please select frequency</option>
                             <option value="7">Every 1 week</option>
                             <option value="14">Every 2 weeks</option>
@@ -52,6 +63,14 @@
                             <option value="30">Every 1 month</option>
                             <option value="60">Every 2 months</option>
                         </select>
+                    </div>
+                    <div class="form-group col-2">
+                        <a href="#" onclick="addIncomeRow(this);">
+                            <i class="fas fa-plus-circle fa-2x"></i>
+                        </a>
+                        <a href="#" onclick="removeIncomeRow(this);">
+                            <i class=" fas fa-minus-circle fa-2x"></i>
+                        </a>
                     </div>
                 </div>
             </section>

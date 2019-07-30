@@ -5,12 +5,7 @@ function navigateTabs(type) {
     arrayOfTabs.forEach(function (item, index) {
 
         var currentTabNumber = index + 1; // need to add one as first array item has index of 0
-        var numberOfTabs = arrayOfTabs.length;
-
-
-
-        // console.log(item.id + ": index[" + currentTabNumber + "]");
-        // console.log("current tab: " + item.id + " - active tab: " + activeTab.id);
+        var numberOfTabs = arrayOfTabs.length; // length of array indicates number of tabs
 
         // loop through all elements that match query selector and only continue for the current active tab
         if (item.id === activeTab.id) {
@@ -43,55 +38,60 @@ function navigateTabs(type) {
                 document.getElementById('prev-btn').classList.remove('hide');
                 document.getElementById('next-btn').classList.add('hide');
             }
-
-
         }
     });
-    // var activeTabPosition = numberOfTabs.indexOf(activeTab);
-    // console.log(activeTab);
-    // console.log(numberOfTabs);
-    // console.log(activeTabPosition);
-
-
-
-    // for (var currentElement = element; currentElement !== document && currentElement; currentElement = currentElement.parentNode) {
-
-    //     if (currentElement.id.startsWith('tab-')) {
-    //         var currentTabParent = currentElement;
-
-    //         for (var nextElement = currentElement.nextElementSibling; nextElement !== document && nextElement; nextElement = nextElement.nextElementSibling) {
-    //             if (nextElement.id.startsWith('tab-')) {
-    //                 var nextTabParent = nextElement;
-    //                 break; // exit the loop
-    //             }
-    //         }
-    //         break; // stop the loop once value found
-    //     }
-    // }
-
-    // // var strPosition = currentTabId.lastIndexOf('-') + 1; // adding one as I want the character after the '-'
-
-    // var nextTabId = 'tab-' + (parseInt(currentTabId.substr(strPosition, 1)) + 1); // take the current tab value and increment it by one to get next tab value
-
-    // currentTabParent.classList.add("hide");
-    // nextTabParent.classList.remove("hide");
 }
 
-function findAllTabs() {
-    var activeTabParent = document.querySelectorAll('section[id^="tab-"]:not(.hide)')[0];
-    var numberOfTabs = document.querySelectorAll('section[id^="tab-"]').length;
+function addIncomeRow(el) {
+    //var copyHTML = document.getElementById(idToCopy).cloneNode(true);
 
-    var strPos = activeTabParent.id.lastIndexOf('-') + 1;
+    var parentElement = el.parentNode.parentNode
+    var element = document.getElementById(parentElement.id);
+
+    var idToAppendTo = parentElement.parentNode.id;
+    var elementId = element.id;
+    var copyHTML = element.cloneNode(true);
 
 
-    var activeTabNumber = activeTabParent.id.substr(strPos, 1);
+    var positionOfString = elementId.lastIndexOf('-') + 1;
+    // var endOfElementId = parseInt(elementId.substr(positionOfString)) + 1;
+    var elementIdPrefix = elementId.substr(0, positionOfString);
 
-    console.log("Active tab: " + activeTabParent.id);
-    console.log("Number of tabs: " + numberOfTabs);
-    console.log("Tab: " + activeTabNumber + " of " + numberOfTabs);
-    // console.log(document.querySelectorAll('<*(id="*tab-.*")*!(hide)>'));
+    // see how many of this id already exist and increment it
+    var countElements = element.parentNode.querySelectorAll('[id^="' + elementIdPrefix + '"').length;
+    var newElementId = elementIdPrefix + parseInt(countElements + 1);
+    // change cloned element id to the new incremented value to keep unique
+    copyHTML.id = newElementId;
+    // execute the clone
+    document.getElementById(idToAppendTo).appendChild(copyHTML);
+
+    var newElementChildren = document.getElementById(newElementId);
+
+    changeAttributeValues(newElementChildren, 'name');
+    changeAttributeValues(newElementChildren, 'id');
+
 }
 
-// window.onload = function () {
-//     findAllTabs();
-// }
+
+function changeAttributeValues(element, attribute) {
+    elementAll = element.querySelectorAll('[' + attribute + ']');
+    elementAll.forEach(function (item) {
+        var childElement = item[attribute];
+        var childPositionOfString = childElement.lastIndexOf('-') + 1;
+
+        var childElementPrefix = childElement.substr(0, childPositionOfString);
+
+        var checkElement = document.querySelectorAll('[' + attribute + '^="' + childElementPrefix + '"');
+
+        item[attribute] = childElementPrefix + checkElement.length;
+    });
+}
+
+function removeIncomeRow(element) {
+    var parentDiv = element.parentNode.parentNode;
+
+    parentDiv.remove();
+
+
+
+}
