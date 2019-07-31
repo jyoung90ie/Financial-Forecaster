@@ -47,15 +47,12 @@ function addIncomeRow(el) {
 
     var parentElement = el.parentNode.parentNode
     var element = document.getElementById(parentElement.id);
+    var elementId = element.id;
+    var elementIdPrefix = getAttributePrefix(elementId);
 
     var idToAppendTo = parentElement.parentNode.id;
-    var elementId = element.id;
+
     var copyHTML = element.cloneNode(true);
-
-
-    var positionOfString = elementId.lastIndexOf('-') + 1;
-    // var endOfElementId = parseInt(elementId.substr(positionOfString)) + 1;
-    var elementIdPrefix = elementId.substr(0, positionOfString);
 
     // see how many of this id already exist and increment it
     var countElements = element.parentNode.querySelectorAll('[id^="' + elementIdPrefix + '"').length;
@@ -77,9 +74,7 @@ function changeAttributeValues(element, attribute) {
     elementAll = element.querySelectorAll('[' + attribute + ']');
     elementAll.forEach(function (item) {
         var childElement = item[attribute];
-        var childPositionOfString = childElement.lastIndexOf('-') + 1;
-
-        var childElementPrefix = childElement.substr(0, childPositionOfString);
+        var childElementPrefix = getAttributePrefix(childElement);
 
         var checkElement = document.querySelectorAll('[' + attribute + '^="' + childElementPrefix + '"');
 
@@ -87,11 +82,131 @@ function changeAttributeValues(element, attribute) {
     });
 }
 
+
+
+
+
 function removeIncomeRow(element) {
     var parentDiv = element.parentNode.parentNode;
+    var parentDivIdPrefix = getAttributePrefix(parentDiv.id);
 
-    parentDiv.remove();
+    var countRemainingRows = document.querySelectorAll('[id^="' + parentDivIdPrefix + '"]').length;
+
+    // check to make sure that there is at least one row before deleting
+    if (countRemainingRows > 1) {
+        // delete the relevant form row
+        parentDiv.remove();
+        // invoke function to iterate through element ID's and names to reindex them so they are in consecutive order with no duplicates
+        elementReindex('tab-2');
+    } else {
+        alert('ERROR: Cannot delete the last row');
+    }
 
 
+}
 
+function elementReindex(parentID) {
+    /* 
+    Runs when a row has been removed.
+
+    Requirement:
+    1. Needs to reindex all ID's
+    2. Needs to reindex all Name's
+
+    */
+
+    // element arrays that need to be changed stored in an array to loop through
+    var attributes = ['id', 'name'];
+
+
+    /* define how I want the elements to be identified */
+
+
+    // cycle through the element attributes that need to be reindexed
+    var arrayOfAttributes = [];
+
+    attributes.forEach(function (attribute) {
+        // var arrayElementAttributes = [];
+
+        var arrayOfElements = document.getElementById(parentID).querySelectorAll('[' + attribute + ']');
+
+        // arrayElementAttributes.push(attribute);
+        arrayOfElements.forEach(function (element) {
+            var currentElementAttribute = element[attribute];
+            var elementAttributePrefix = getAttributePrefix(currentElementAttribute);
+
+            var ref = "[" + attribute + "]" + elementAttributePrefix;
+            var countOfAttribute = document.querySelectorAll('[' + attribute + '^="' + elementAttributePrefix + '"]').length;
+
+
+            if (arrayOfAttributes.length === 0) {
+                // if there array has no values then set first value
+                pushValuesToArray(arrayOfAttributes, ref, elementAttributePrefix, attribute, countOfAttribute);
+            } else {
+                // if array has at least one value then check the array to make sure the current ref is not already contained
+                var findRefVal = 0;
+                for (i = 0; i < arrayOfAttributes.length; i++) {
+                    if (arrayOfAttributes[i]["ref"] === ref) {
+                        // if the current ref ([attribute]elementprefix) is found set the value to 1 which means that the values will NOT be pushed to the array and end the loop
+                        findRefVal = 1;
+                        break;
+                    }
+                }
+
+                // if the ref was not found then add it to the array
+                if (findRefVal === 0) {
+                    pushValuesToArray(arrayOfAttributes, ref, elementAttributePrefix, attribute, countOfAttribute);
+                }
+            }
+
+        });
+    });
+
+    processElementReindex(arrayOfAttributes);
+}
+
+function processElementReindex(array) {
+    if (array.length === 0) {
+        console.log('ERROR: empty array passed to function - cannot proceed');
+        return;
+    }
+
+    for (i = 0; i < array.length; i++) {
+        var attribute = array[i]["attribute"];
+        var attributePrefix = array[i]["prefix"];
+        var elements = document.querySelectorAll('[' + attribute + '^="' + attributePrefix + '"]');
+
+        elements.forEach(function (item) {
+            var currentAttributeName = item[attribute];
+            var attributeCurrent = array[i]["current"];
+            var newAttributeName = attributePrefix + attributeCurrent;
+
+            if (currentAttributeName !== newAttributeName) {
+                console.log('Old: ' + item[attribute] + ' ~ New: ' + newAttributeName);
+                item[attribute] = newAttributeName;
+
+            }
+            array[i]["current"]++;
+
+        });
+
+    }
+}
+
+function pushValuesToArray(array, ref, elementName, elementAttribute, count) {
+    array.push({
+        "ref": ref,
+        "prefix": elementName,
+        "attribute": elementAttribute,
+        "count": count,
+        "current": 1
+    });
+}
+
+function getAttributePrefix(attributeValue) {
+    if (typeof (attributeValue) == "string") {
+        var splitStringPosition = parseInt(attributeValue.lastIndexOf('-')) + 1;
+
+        return attributeValue.substr(0, splitStringPosition);
+    }
 }
