@@ -1,6 +1,42 @@
+let minRows = 1; // minimum total number of form rows
+let maxRows = 12; // maximum total number of form rows
+let startTab = 0; // first tab = 0
+
+let tabIdentifier = 'tab'; // word which identifies all tabs
+
+initTab(startTab);
+
+function getActiveTab() {
+    return document.querySelectorAll('section[id*="' + tabIdentifier + '"]:not(.hide)')[0];;
+}
+
+function getTabs() {
+    return document.querySelectorAll('section[id*="' + tabIdentifier + '"]');
+}
+
+function initTab(startTab) {
+    // function which will set the current tab
+    var allTabs = getTabs();
+    var getTabIndicators = document.querySelectorAll('#progress-indicator span');
+    var numberOfTabs = allTabs.length;
+
+    for (i = 0; i < numberOfTabs; i++) {
+        if (i === startTab) {
+            allTabs[i].classList.remove('hide');
+            getTabIndicators[i].classList.add('active');
+        } else {
+            allTabs[i].classList.add('hide');
+            getTabIndicators[i].classList.remove('active');
+        }
+    }
+}
+
+
 function navigateTabs(type) {
-    var activeTab = document.querySelectorAll('section[id*="tab-"]:not(.hide)')[0];
-    var arrayOfTabs = document.querySelectorAll('section[id*="tab-"]');
+    var activeTab = getActiveTab();
+    var arrayOfTabs = getTabs();
+
+    var getTabIndicators = document.querySelectorAll('#progress-indicator span');
 
     arrayOfTabs.forEach(function (item, index) {
 
@@ -25,52 +61,64 @@ function navigateTabs(type) {
             if (adjTabNumber === 1) {
                 document.getElementById('prev-btn').classList.add('hide');
                 document.getElementById('next-btn').classList.remove('hide');
+                document.getElementById('submit-btn').classList.add('hide');
             } else if (adjTabNumber > 1 && adjTabNumber < numberOfTabs) {
                 // show next and previous
                 document.getElementById('prev-btn').classList.remove('hide');
                 document.getElementById('next-btn').classList.remove('hide');
+                document.getElementById('submit-btn').classList.add('hide');
             } else if (adjTabNumber === numberOfTabs) {
                 // show prev only
                 document.getElementById('prev-btn').classList.remove('hide');
                 document.getElementById('next-btn').classList.add('hide');
+                document.getElementById('submit-btn').classList.remove('hide');
             } else {
                 // show prev only
                 document.getElementById('prev-btn').classList.remove('hide');
                 document.getElementById('next-btn').classList.add('hide');
+                document.getElementById('submit-btn').classList.remove('hide');
             }
         }
     });
 }
 
-function addIncomeRow(el) {
-    //var copyHTML = document.getElementById(idToCopy).cloneNode(true);
-
+function addFormRow(el) {
     var parentElement = el.parentNode.parentNode
     var element = document.getElementById(parentElement.id);
     var elementId = element.id;
     var elementIdPrefix = getAttributePrefix(elementId);
 
-    var idToAppendTo = parentElement.parentNode.id;
-
-    var copyHTML = element.cloneNode(true);
-
-    // see how many of this id already exist and increment it
     var countElements = element.parentNode.querySelectorAll('[id^="' + elementIdPrefix + '"').length;
-    var newElementId = elementIdPrefix + parseInt(countElements + 1);
-    // change cloned element id to the new incremented value to keep unique
-    copyHTML.id = newElementId;
-    // execute the clone
-    document.getElementById(idToAppendTo).appendChild(copyHTML);
 
-    var newElementChildren = document.getElementById(newElementId);
+    // check to make sure that there is at least one row before deleting
+    if (countElements < maxRows) {
+        var idToAppendTo = parentElement.parentNode.id;
 
-    changeAttributeValues(newElementChildren, 'name');
-    changeAttributeValues(newElementChildren, 'id');
+        var copyHTML = element.cloneNode(true);
 
+        // see how many of this id already exist and increment it
+
+        var newElementId = elementIdPrefix + parseInt(countElements + 1);
+        // change cloned element id to the new incremented value to keep unique
+        copyHTML.id = newElementId;
+        // execute the clone
+        document.getElementById(idToAppendTo).appendChild(copyHTML);
+
+        var newElementChildren = document.getElementById(newElementId);
+
+        changeAttributeValues(newElementChildren, 'name');
+        changeAttributeValues(newElementChildren, 'id');
+    } else {
+        alert("NOTE: You have reached the maximum permittable amount of form rows.");
+    }
 }
 
 
 function changeAttributeValues(element, attribute) {
+    /*
+    Function is invoked when a new form row is added. It will iterate through new form elements and update the relevant attribute values
+    to ensure they remain unique (e.g. name and id)
+    */
     elementAll = element.querySelectorAll('[' + attribute + ']');
     elementAll.forEach(function (item) {
         var childElement = item[attribute];
@@ -83,60 +131,46 @@ function changeAttributeValues(element, attribute) {
 }
 
 
-
-
-
-function removeIncomeRow(element) {
+function removeFormRow(element) {
     var parentDiv = element.parentNode.parentNode;
     var parentDivIdPrefix = getAttributePrefix(parentDiv.id);
 
     var countRemainingRows = document.querySelectorAll('[id^="' + parentDivIdPrefix + '"]').length;
 
     // check to make sure that there is at least one row before deleting
-    if (countRemainingRows > 1) {
+    if (countRemainingRows > minRows) {
         // delete the relevant form row
         parentDiv.remove();
         // invoke function to iterate through element ID's and names to reindex them so they are in consecutive order with no duplicates
-        elementReindex('tab-2');
+        elementReindex();
     } else {
-        alert('ERROR: Cannot delete the last row');
+        alert('ERROR: Cannot delete the last form row.');
     }
-
-
 }
 
-function elementReindex(parentID) {
+function elementReindex() {
     /* 
     Runs when a row has been removed.
-
-    Requirement:
-    1. Needs to reindex all ID's
-    2. Needs to reindex all Name's
-
     */
+
+    // limit the scope of the application to the current tab
+    var parentID = getActiveTab();
 
     // element arrays that need to be changed stored in an array to loop through
     var attributes = ['id', 'name'];
-
-
-    /* define how I want the elements to be identified */
-
 
     // cycle through the element attributes that need to be reindexed
     var arrayOfAttributes = [];
 
     attributes.forEach(function (attribute) {
-        // var arrayElementAttributes = [];
-
         var arrayOfElements = document.getElementById(parentID).querySelectorAll('[' + attribute + ']');
 
-        // arrayElementAttributes.push(attribute);
         arrayOfElements.forEach(function (element) {
             var currentElementAttribute = element[attribute];
             var elementAttributePrefix = getAttributePrefix(currentElementAttribute);
 
             var ref = "[" + attribute + "]" + elementAttributePrefix;
-            var countOfAttribute = document.querySelectorAll('[' + attribute + '^="' + elementAttributePrefix + '"]').length;
+            var countOfAttribute = document.getElementById(parentID).querySelectorAll('[' + attribute + '^="' + elementAttributePrefix + '"]').length;
 
 
             if (arrayOfAttributes.length === 0) {
@@ -158,7 +192,6 @@ function elementReindex(parentID) {
                     pushValuesToArray(arrayOfAttributes, ref, elementAttributePrefix, attribute, countOfAttribute);
                 }
             }
-
         });
     });
 

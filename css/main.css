@@ -1,18 +1,55 @@
 .container {
     height: 100vh;
     display: flex;
-    flex-direction: column;
 }
 
 .content-box {
     width: 100%;
-    height: auto;
+    height: 70%;
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 8px;
     border: solid grey 1px;
     margin: auto;
+
 }
 
 .hide {
+    transition-duration: 2s;
+    transition-property: all;
+    right: 0;
     display: none;
+}
+
+h2 {
+    padding-bottom: 30px;
+}
+
+
+section[id*='tab'] {
+    animation: ;
+
+}
+
+
+#navigation {
+    float: right;
+}
+
+
+.add-remove-btns {
+    font-size: 21px;
+}
+
+.tab {
+    height: 13px;
+    width: 13px;
+    border-radius: 50%;
+    border: none;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.tab.active {
+    background-color: rgba(0, 0, 0, 1);
 }
