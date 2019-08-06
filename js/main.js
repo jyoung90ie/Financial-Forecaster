@@ -4,6 +4,10 @@ let startTab = 0; // first tab = 0
 
 let tabIdentifier = 'tab'; // word which identifies all tabs
 
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const submitBtn = document.getElementById('submit-btn');
+
 const getActiveTab = () => document.querySelectorAll('section[id*="' + tabIdentifier + '"]:not(.hide)')[0];
 
 const getTabs = () => document.querySelectorAll('section[id*="' + tabIdentifier + '"]');
@@ -26,11 +30,19 @@ const getAttributePrefix = attributeValue => {
     }
 };
 
-function initTab(startTab) {
+function initTab(startTab = 0) {
     // function which will set the current tab
     let allTabs = getTabs();
     let getTabIndicators = document.querySelectorAll('#progress-indicator span');
     let numberOfTabs = allTabs.length;
+
+    if (startTab > numberOfTabs - 1) {
+        console.log(`ERROR: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(${numberOfTabs - 1}).`);
+        startTab = numberOfTabs - 1;
+    } else if (startTab < 0) {
+        console.log(`ERROR: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(0).`);
+        startTab = 0;
+    }
 
     for (let i = 0; i < numberOfTabs; i++) {
         if (i === startTab) {
@@ -40,6 +52,19 @@ function initTab(startTab) {
             allTabs[i].classList.add('hide');
             getTabIndicators[i].classList.remove('active');
         }
+    }
+
+    nextBtn.classList.remove('hide');
+    prevBtn.classList.remove('hide');
+    submitBtn.classList.remove('hide');
+
+    if (startTab === 0) {
+        submitBtn.classList.add('hide');
+        prevBtn.classList.add('hide');
+    } else if (startTab === numberOfTabs - 1) {
+        nextBtn.classList.add('hide');
+    } else {
+        submitBtn.classList.add('hide');
     }
 }
 
@@ -71,25 +96,26 @@ function navigateTabs(type) {
             activeTab.classList.add('hide');
 
             // buttons to be displayed are based on what the next tab is, i.e. if I clicked the next button whilst on tab 1, then I need to consider what buttons should be shown based on tab 2 - hence adjTabNumber accounts for this
+
             if (adjTabNumber === 1) {
-                document.getElementById('prev-btn').classList.add('hide');
-                document.getElementById('next-btn').classList.remove('hide');
-                document.getElementById('submit-btn').classList.add('hide');
+                prevBtn.classList.add('hide');
+                nextBtn.classList.remove('hide');
+                submitBtn.classList.add('hide');
             } else if (adjTabNumber > 1 && adjTabNumber < numberOfTabs) {
                 // show next and previous
-                document.getElementById('prev-btn').classList.remove('hide');
-                document.getElementById('next-btn').classList.remove('hide');
-                document.getElementById('submit-btn').classList.add('hide');
+                prevBtn.classList.remove('hide');
+                nextBtn.classList.remove('hide');
+                submitBtn.classList.add('hide');
             } else if (adjTabNumber === numberOfTabs) {
                 // show prev only
-                document.getElementById('prev-btn').classList.remove('hide');
-                document.getElementById('next-btn').classList.add('hide');
-                document.getElementById('submit-btn').classList.remove('hide');
+                prevBtn.classList.remove('hide');
+                nextBtn.classList.add('hide');
+                submitBtn.classList.remove('hide');
             } else {
                 // show prev only
-                document.getElementById('prev-btn').classList.remove('hide');
-                document.getElementById('next-btn').classList.add('hide');
-                document.getElementById('submit-btn').classList.remove('hide');
+                prevBtn.classList.remove('hide');
+                nextBtn.classList.add('hide');
+                submitBtn.classList.remove('hide');
             }
         }
     });
@@ -328,7 +354,12 @@ form.addEventListener('change', event => {
     }
 });
 
+form.addEventListener('submit', event => {
+    event.preventDefault();
+    console.log('test');
+});
 
 
 
-initTab(startTab);
+// initTab(startTab);
+initTab(5);
