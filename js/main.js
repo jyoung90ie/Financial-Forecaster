@@ -7,6 +7,9 @@ let tabIdentifier = 'tab'; // word which identifies all tabs
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const submitBtn = document.getElementById('submit-btn');
+const form = document.querySelector('form');
+const summaryTab = document.querySelector('#summary-tab');
+
 
 const getActiveTab = () => document.querySelectorAll('section[id*="' + tabIdentifier + '"]:not(.hide)')[0];
 
@@ -36,9 +39,11 @@ function initTab(startTab = 0) {
     let getTabIndicators = document.querySelectorAll('#progress-indicator span');
     let numberOfTabs = allTabs.length;
 
-    if (startTab > numberOfTabs - 1) {
-        console.log(`ERROR: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(${numberOfTabs - 1}).`);
-        startTab = numberOfTabs - 1;
+    let maxTab = numberOfTabs - 2; // array starts at zero therefore -1; another -1 as I want the final tab not to be accessible by next button, only by submit button.
+
+    if (startTab > maxTab) {
+        console.log(`ERROR: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(${maxTab}).`);
+        startTab = maxTab;
     } else if (startTab < 0) {
         console.log(`ERROR: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(0).`);
         startTab = 0;
@@ -61,7 +66,7 @@ function initTab(startTab = 0) {
     if (startTab === 0) {
         submitBtn.classList.add('hide');
         prevBtn.classList.add('hide');
-    } else if (startTab === numberOfTabs - 1) {
+    } else if (startTab === maxTab) {
         nextBtn.classList.add('hide');
     } else {
         submitBtn.classList.add('hide');
@@ -101,21 +106,26 @@ function navigateTabs(type) {
                 prevBtn.classList.add('hide');
                 nextBtn.classList.remove('hide');
                 submitBtn.classList.add('hide');
-            } else if (adjTabNumber > 1 && adjTabNumber < numberOfTabs) {
+            } else if (adjTabNumber > 1 && adjTabNumber < numberOfTabs - 1) {
                 // show next and previous
                 prevBtn.classList.remove('hide');
                 nextBtn.classList.remove('hide');
                 submitBtn.classList.add('hide');
-            } else if (adjTabNumber === numberOfTabs) {
+            } else if (adjTabNumber === numberOfTabs - 1) {
                 // show prev only
                 prevBtn.classList.remove('hide');
                 nextBtn.classList.add('hide');
                 submitBtn.classList.remove('hide');
+            } else if (adjTabNumber === numberOfTabs) {
+                console.log('test');
+                prevBtn.classList.remove('hide');
+                nextBtn.classList.add('hide');
+                submitBtn.classList.add('hide');
             } else {
                 // show prev only
                 prevBtn.classList.remove('hide');
                 nextBtn.classList.add('hide');
-                submitBtn.classList.remove('hide');
+                submitBtn.classList.add('hide');
             }
         }
     });
@@ -317,10 +327,7 @@ const validateNumber = text => {
     return pattern.test(text);
 };
 
-
-// event listener
-const form = document.querySelector('form');
-
+// form event listener
 form.addEventListener('change', event => {
     if (event.target.nodeName === 'INPUT') {
         if (event.target.id.includes('label')) {
@@ -354,12 +361,157 @@ form.addEventListener('change', event => {
     }
 });
 
+const filterArray = (data, filter) => {
+    let array;
+
+    if (typeof data !== 'object') {
+        array = Array.from(data);
+    } else {
+        array = data;
+    }
+
+    const filteredData = array.filter(name => name.includes(filter));
+
+    let newData = [];
+    let last;
+
+    for (let i = 0; i < filteredData.length; i++) {
+        let item = filteredData[i];
+        let curr = item.substr(item.lastIndexOf('-') + 1) - 1;
+
+        if (last === 'undefined') {
+            last = curr;
+            newData[curr] = {};
+        }
+
+        if (last !== curr) {
+            newData[curr] = {};
+        }
+
+        if (item.includes('label')) {
+            newData[curr]['label'] = form[item].value;
+        } else if (item.includes('amount')) {
+            newData[curr]['amount'] = Number(form[item].value);
+        } else if (item.includes('frequency')) {
+            newData[curr]['frequency'] = form[item].value;
+        } else if (item.includes('type')) {
+            newData[curr]['type'] = form[item].value;
+        } else {
+            newData[curr][item] = form[item].value;
+        }
+        last = curr;
+    }
+
+    return newData;
+};
+
+const numberFormat = num => {
+    if (typeof num === 'number') {
+        return Math.round(num).toLocaleString();
+    } else {
+        return num;
+    }
+
+};
+
+
+const netWorthCalc = (accounts, incomes, outgoings, years = 3) => {
+
+    console.log(accounts);
+    console.log(incomes);
+    console.log(outgoings);
+
+    let netWorth = 0;
+
+    console.log('net worth after 1 year ----- ');
+
+
+    // calculate the total net worth opening position (i.e. total account balance)
+
+    const accountsTotal = accounts.reduce((total, account) => {
+        total += account.amount;
+        return total;
+    }, 0);
+
+    // calculate the yearly total for income and outgoings
+
+    const incomeTotal = incomes.reduce((total, income) => {
+        total += income.amount * getScalar(income.frequency);
+        return total;
+    }, 0);
+
+    const outgoingTotal = outgoings.reduce((total, outgoing) => {
+        total -= outgoing.amount * getScalar(outgoing.frequency);
+        return total;
+    }, 0);
+
+    let netWorthHTML = '';
+    let openingBalance = accountsTotal;
+    let income = incomeTotal;
+    let outgoing = outgoingTotal;
+    let closingBalance = openingBalance + income + outgoing;
+
+    // create summary table for data split by year
+    for (let i = 0; i <= years; i++) {
+        if (i > 0) {
+            openingBalance = accountsTotal + (income + outgoing) * i;
+            closingBalance = openingBalance + (income + outgoing);
+        }
+        if (i === years) {
+            income = '-';
+            outgoing = '-';
+            closingBalance = '-';
+        }
+
+        netWorthHTML += `
+        <tr>
+            <td>${i}</td>
+            <td>${numberFormat(openingBalance)}</td>
+            <td>${numberFormat(income)}</td>
+            <td>${numberFormat(outgoing)}</td>
+            <td>${numberFormat(closingBalance)}</td>
+        </tr>`;
+    }
+
+    summaryTab.innerHTML = `
+            <h2>Net Worth after ${years} years</h2>
+            <table class="table text-center">
+                <thead>
+                    <tr>
+                        <th>Year</th>
+                        <th>Opening Balance</th>
+                        <th>Income</th>
+                        <th>Outgoings</th>
+                        <th>Closing Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${netWorthHTML}
+                </tbody>
+            </table>`;
+
+};
+
 form.addEventListener('submit', event => {
     event.preventDefault();
-    console.log('test');
+
+    const formData = Array.from(form)
+        .filter(element => element.name !== '')
+        .map(element => element.name);
+
+    // console.log(formData);
+
+    const accountData = filterArray(formData, 'account');
+    const incomeData = filterArray(formData, 'income');
+    const outgoingData = filterArray(formData, 'outgoing');
+
+    navigateTabs('next');
+    netWorthCalc(accountData, incomeData, outgoingData, 10);
+
+
+
 });
 
 
 
-// initTab(startTab);
 initTab(5);
