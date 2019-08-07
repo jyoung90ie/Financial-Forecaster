@@ -16,13 +16,13 @@
     <main class="content-box">
         <form class="m-2">
             <section id="intro-tab">
-                <h2>Welcome..</h2>
+                <h2><i class="fas fa-home"></i> Welcome</h2>
                 <p>Introduction Text</p>
                 <p>Some more text</p>
                 <p>Final text</p>
             </section>
             <section id="general-tab" class="hide">
-                <h2>Please provide some details..</h2>
+                <h2><i class="fas fa-user-circle"></i> Personal Details</h2>
                 <div class="form-row">
                     <div class="form-group col">
                         <label for="first-name">First Name</label>
@@ -45,7 +45,7 @@
                 <div class="form-row">
                     <div class="form-group col">
                         <label for="goal">Goal</label>
-                        <select class="custom-select custom-select-sm" name="goal" id="goal" required>
+                        <select class="custom-select custom-select-sm" name="goal" id="goal">
                             <option value="">Please select your goal</option>
                             <option value="1">Reduce Debt</option>
                             <option value="2">Increase Savings</option>
@@ -60,7 +60,7 @@
                 <div class="form-row">
                     <div class="form-group col-6">
                         <label for="currency">Currency</label>
-                        <select class="custom-select custom-select-sm" name="currency" id="currency" required>
+                        <select class="custom-select custom-select-sm" name="currency" id="currency">
                             <option value="">Please select your goal</option>
                             <option value="1">Currency 1</option>
                             <option value="2">Currency 2</option>
@@ -69,8 +69,7 @@
                 </div>
             </section>
             <section id="account-tab" class="hide">
-                <h2>Please input the current balance amounts for your accounts (e.g. current, savings, credit cards,
-                    savings, investments, etc.) </h2>
+                <h2><i class="fas fa-credit-card"></i> Accounts</h2>
                 <div class="form-row">
                     <div class="col-3">Account</div>
                     <div class="col-2">Balance</div>
@@ -86,8 +85,7 @@
                             id="account-amount-1" placeholder="Amount">
                     </div>
                     <div class="form-group col-3">
-                        <select class="custom-select custom-select-sm" name="account-frequency-1"
-                            id="account-frequency-1" required>
+                        <select class="custom-select custom-select-sm" name="account-type-1" id="account-type-1">
                             <option value=""></option>
                             <option value="1">Current Account</option>
                             <option value="2">Savings Account</option>
@@ -98,16 +96,16 @@
                     </div>
                     <div class="form-group col-1 offset-3 add-remove-btns">
                         <a href="#" onclick="addFormRow(this);">
-                            <i class="fas fa-plus-circle"></i>
+                            <i class="fas fa-plus"></i>
                         </a>
                         <a href="#" onclick="removeFormRow(this);">
-                            <i class=" fas fa-minus-circle"></i>
+                            <i class="far fa-trash-alt"></i>
                         </a>
                     </div>
                 </div>
             </section>
             <section id="income-tab" class="hide">
-                <h2>Please input your regular incomes..</h2>
+                <h2><i class="fas fa-piggy-bank"></i> Regular Income(s)</h2>
                 <div class="form-row">
                     <div class="col-3">Label</div>
                     <div class="col-2">Amount</div>
@@ -123,8 +121,8 @@
                             id="income-amount-1" placeholder="Amount">
                     </div>
                     <div class="form-group col-3">
-                        <select class="custom-select custom-select-sm" name="income-frequency-1" id="income-frequency-1"
-                            required>
+                        <select class="custom-select custom-select-sm" name="income-frequency-1"
+                            id="income-frequency-1">
                             <option value=""></option>
                             <option value="7">Every 1 week</option>
                             <option value="14">Every 2 weeks</option>
@@ -135,16 +133,16 @@
                     </div>
                     <div class="form-group col-1 offset-3 add-remove-btns">
                         <a href="#" onclick="addFormRow(this);">
-                            <i class="fas fa-plus-circle"></i>
+                            <i class="fas fa-plus"></i>
                         </a>
                         <a href="#" onclick="removeFormRow(this);">
-                            <i class=" fas fa-minus-circle"></i>
+                            <i class="far fa-trash-alt"></i>
                         </a>
                     </div>
                 </div>
             </section>
             <section id="outgoing-tab" class="hide">
-                <h2>Please input regular outgoings..</h2>
+                <h2><i class="fas fa-shopping-basket"></i> Regularing Outgoing(s)</h2>
                 <div class="form-row">
                     <div class="col-3">Label</div>
                     <div class="col-2">Amount</div>
@@ -163,7 +161,7 @@
                     </div>
                     <div class="form-group col-3">
                         <select class="custom-select custom-select-sm" name="outgoing-frequency-1"
-                            id="outgoing-frequency-1" required>
+                            id="outgoing-frequency-1">
                             <option value=""></option>
                             <option value="7">Every 1 week</option>
                             <option value="14">Every 2 weeks</option>
@@ -173,8 +171,7 @@
                         </select>
                     </div>
                     <div class="form-group col-3">
-                        <select class="custom-select custom-select-sm" name="outgoing-type-1" id="outgoing-type-1"
-                            required>
+                        <select class="custom-select custom-select-sm" name="outgoing-type-1" id="outgoing-type-1">
                             <option value=""></option>
                             <option value="1">Bill</option>
                             <option value="2">Loan</option>
@@ -185,19 +182,15 @@
                     </div>
                     <div class="form-group col-1 add-remove-btns">
                         <a href="#" onclick="addFormRow(this);">
-                            <i class="fas fa-plus-circle"></i>
+                            <i class="fas fa-plus"></i>
                         </a>
                         <a href="#" onclick="removeFormRow(this);">
-                            <i class=" fas fa-minus-circle"></i>
+                            <i class="far fa-trash-alt"></i>
                         </a>
                     </div>
                 </div>
             </section>
-            <section id="summary-tab" class="hide">
-                <h2>Based on your inputs we estimate that...</h2>
-                <p>[IF TARGET SAVINGS]You will achieve your desired savings target on [DATE]</p>
-                <p>[IF TARGET DATE]Your net worth will be [NET WORTH] by [TARGET DATE]</p>
-            </section>
+            <section id="summary-tab" class="hide"></section>
             <section id="navigation">
                 <div class="form-group">
                     <button type="button" class="btn btn-primary hide" id="prev-btn"
@@ -222,6 +215,7 @@
 
 
     <script src="js/main.js"></script>
+    <script src="js/testdata.js"></script>
 
 </body>
 
