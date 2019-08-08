@@ -1,8 +1,8 @@
-let minRows = 1; // minimum total number of form rows
-let maxRows = 12; // maximum total number of form rows
-let startTab = 4; // first tab = 0
+const minRows = 1; // minimum total number of form rows
+const maxRows = 12; // maximum total number of form rows
+const startTab = 4; // first tab = 0
 
-let tabIdentifier = 'tab'; // word which identifies all tabs
+const tabIdentifier = 'tab'; // word which identifies all tabs
 
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
@@ -10,7 +10,7 @@ const submitBtn = document.getElementById('submit-btn');
 const form = document.querySelector('form');
 const summaryTab = document.querySelector('#summary-tab');
 const progressIndicator = document.querySelector('#progress-indicator');
-const contentbox = document.querySelector('.content-box');
+const contentBox = document.querySelector('.content-box');
 
 
 const getActiveTab = () => document.querySelectorAll('section[id*="' + tabIdentifier + '"]:not(.hide)')[0];
@@ -37,8 +37,8 @@ const getAttributePrefix = attributeValue => {
 
 const initTab = (startTab = 0) => {
     // function which will set the current tab
-    let allTabs = getTabs();
-    let numberOfTabs = allTabs.length;
+    const allTabs = getTabs();
+    const numberOfTabs = allTabs.length;
 
     let maxTab = numberOfTabs - 2; // array starts at zero therefore -1; another -1 as I want the final tab not to be accessible by next button, only by submit button.
 
@@ -90,10 +90,8 @@ const updateNavButtons = () => {
 
 
 const navigateTabs = type => {
-    // let activeTab = getActiveTab();
-    let tabs = Array.from(getTabs());
-
-    const numberOfTabs = getTabs().length;
+    const tabs = Array.from(getTabs());
+    const numberOfTabs = tabs.length;
     const activeTab = tabs.indexOf(getActiveTab());
 
     let nextTab;
@@ -116,31 +114,6 @@ const navigateTabs = type => {
             tabs[i].classList.remove('slide-in-left', 'slide-in-right');
         }
     }
-    // tabs.forEach((tab, index) => {
-    //     // loop through all elements that match query selector and only continue for the current active tab
-
-
-    //     if (tab.id === activeTab.id) {
-    //         tab.classList.remove('slide-in');
-    //         tab.classList.add('slide-out');
-    //         if (type === 'next') {
-    //             tabs[index + 1].classList.remove('hide');
-    //             tabs[index + 1].classList.add('slide-in');
-
-    //         } else if (type === 'prev') {
-    //             tabs[index - 1].classList.remove('hide');
-    //             tabs[index + 1].classList.add('slide-in');
-
-    //         } else {
-    //             console.log('ERROR: Function argument "type" value is not accepted.');
-    //         }
-    //         // now that the new tab is unhidden, hide the active tab
-    //         tab.classList.add('hide');
-
-
-    //     }
-
-    // });
 
     updateNavButtons();
     updateTabIndicator();
@@ -163,31 +136,47 @@ const updateTabIndicator = () => {
     progressIndicator.innerHTML = progressIndicatorHTML;
 };
 
-const addFormRow = el => {
-    let parentElement = el.parentNode.parentNode
-    let element = document.getElementById(parentElement.id);
-    let elementIdPrefix = getAttributePrefix(element.id);
+const addFormRow = elementId => {
+    const element = document.getElementById(elementId);
+    const elementIdPrefix = getAttributePrefix(elementId);
 
-    let countElements = element.parentNode.querySelectorAll('[id^="' + elementIdPrefix + '"').length;
+    const countElements = document.querySelectorAll('[id^="' + elementIdPrefix + '"').length;
 
     // check to make sure that there is at least one row before deleting
     if (countElements < maxRows) {
-        let idToAppendTo = parentElement.parentNode.id;
+        const idToAppendTo = element.parentNode.id;
         let copyHTML = element.cloneNode(true);
 
         // see how many of this id already exist and increment it
-        let newElementId = elementIdPrefix + parseInt(countElements + 1);
+        const newElementId = elementIdPrefix + parseInt(countElements + 1);
         // change cloned element id to the new incremented value to keep unique
         copyHTML.id = newElementId;
         // execute the clone
         document.getElementById(idToAppendTo).appendChild(copyHTML);
 
-        let newElementChildren = document.getElementById(newElementId);
+        const newElementChildren = document.getElementById(newElementId);
 
         changeAttributeValues(newElementChildren, 'name');
         changeAttributeValues(newElementChildren, 'id');
     } else {
         alert("NOTE: You have reached the maximum permittable amount of form rows.");
+    }
+};
+
+const removeFormRow = elementId => {
+    const element = document.getElementById(elementId);
+    const parentDivIdPrefix = getAttributePrefix(elementId);
+
+    const countRemainingRows = document.querySelectorAll('[id^="' + parentDivIdPrefix + '"]').length;
+
+    // check to make sure that there is at least one row before deleting
+    if (countRemainingRows > minRows) {
+        // delete the relevant form row
+        element.remove();
+        // invoke function to iterate through element ID's and names to reindex them so they are in consecutive order with no duplicates
+        elementReindex();
+    } else {
+        alert('ERROR: Cannot delete the last form row.');
     }
 };
 
@@ -212,24 +201,6 @@ const changeAttributeValues = (parentElement, attribute) => {
         childElement.value = "";
         childElement.classList.remove('success', 'fail');
     });
-};
-
-
-const removeFormRow = element => {
-    let parentDiv = element.parentNode.parentNode;
-    let parentDivIdPrefix = getAttributePrefix(parentDiv.id);
-
-    let countRemainingRows = document.querySelectorAll('[id^="' + parentDivIdPrefix + '"]').length;
-
-    // check to make sure that there is at least one row before deleting
-    if (countRemainingRows > minRows) {
-        // delete the relevant form row
-        parentDiv.remove();
-        // invoke function to iterate through element ID's and names to reindex them so they are in consecutive order with no duplicates
-        elementReindex();
-    } else {
-        alert('ERROR: Cannot delete the last form row.');
-    }
 };
 
 const elementReindex = () => {
@@ -299,9 +270,7 @@ const processElementReindex = array => {
             let newAttributeName = attributePrefix + attributeCurrent;
 
             if (currentAttributeName !== newAttributeName) {
-                // console.log('Old: ' + element[attribute] + ' ~ New: ' + newAttributeName);
                 element[attribute] = newAttributeName;
-
             }
             array[i]["current"]++;
 
@@ -522,24 +491,57 @@ form.addEventListener('change', event => {
     }
 });
 
-form.addEventListener('submit', event => {
-    event.preventDefault();
+// form.addEventListener('submit', event => {
+//     event.preventDefault();
 
-    const formData = Array.from(form)
-        .filter(element => element.name !== '')
-        .map(element => element.name);
+//     const formData = Array.from(form)
+//         .filter(element => element.name !== '')
+//         .map(element => element.name);
 
-    // console.log(formData);
+//     const accountData = filterArray(formData, 'account');
+//     const incomeData = filterArray(formData, 'income');
+//     const outgoingData = filterArray(formData, 'outgoing');
 
-    const accountData = filterArray(formData, 'account');
-    const incomeData = filterArray(formData, 'income');
-    const outgoingData = filterArray(formData, 'outgoing');
+//     navigateTabs('next');
+//     netWorthCalc(accountData, incomeData, outgoingData, 10);
+// });
 
-    navigateTabs('next');
-    netWorthCalc(accountData, incomeData, outgoingData, 10);
+form.addEventListener('click', event => {
+    // console.log(event);
+    const activeTab = getActiveTab();
+    const target = event.target;
 
 
+    if (target.id === 'prev-btn') {
+        navigateTabs('prev');
+    } else if (target.id === 'next-btn') {
+        navigateTabs('next');
+    } else if (target.id === 'submit-btn') {
+        event.preventDefault();
 
+        const formData = Array.from(form)
+            .filter(element => element.name !== '')
+            .map(element => element.name);
+
+        const accountData = filterArray(formData, 'account');
+        const incomeData = filterArray(formData, 'income');
+        const outgoingData = filterArray(formData, 'outgoing');
+
+        navigateTabs('next');
+        netWorthCalc(accountData, incomeData, outgoingData, 10);
+    } else if (target.className.includes('fa-plus')) {
+        const parentID = event.path
+            .filter(item => item.nodeName === 'DIV' && item.id !== '')
+            .map(item => item.id);
+
+        addFormRow(parentID[0]);
+    } else if (target.className.includes('fa-trash-alt')) {
+        const parentID = event.path
+            .filter(item => item.nodeName === 'DIV' && item.id !== '')
+            .map(item => item.id);
+
+        removeFormRow(parentID[0]);
+    }
 });
 
 
