@@ -10,6 +10,7 @@ const submitBtn = document.getElementById('submit-btn');
 const form = document.querySelector('form');
 const summaryTab = document.querySelector('#summary-tab');
 const progressIndicator = document.querySelector('#progress-indicator');
+const contentbox = document.querySelector('.content-box');
 
 
 const getActiveTab = () => document.querySelectorAll('section[id*="' + tabIdentifier + '"]:not(.hide)')[0];
@@ -52,6 +53,7 @@ const initTab = (startTab = 0) => {
     for (let i = 0; i < numberOfTabs; i++) {
         if (i === startTab) {
             allTabs[i].classList.remove('hide');
+            allTabs[i].classList.add('slide-in-left');
         } else {
             allTabs[i].classList.add('hide');
         }
@@ -88,25 +90,57 @@ const updateNavButtons = () => {
 
 
 const navigateTabs = type => {
-    let activeTab = getActiveTab();
-    let tabs = getTabs();
+    // let activeTab = getActiveTab();
+    let tabs = Array.from(getTabs());
 
-    tabs.forEach((tab, index) => {
-        // loop through all elements that match query selector and only continue for the current active tab
+    const numberOfTabs = getTabs().length;
+    const activeTab = tabs.indexOf(getActiveTab());
 
-        if (tab.id === activeTab.id) {
-            if (type === 'next') {
-                tabs[index + 1].classList.remove('hide');
-            } else if (type === 'prev') {
-                tabs[index - 1].classList.remove('hide');
-            } else {
-                console.log('ERROR: Function argument "type" value is not accepted.');
-            }
-            // now that the new tab is unhidden, hide the active tab
-            tab.classList.add('hide');
+    let nextTab;
+    let htmlClass;
+
+    if (type === 'next') {
+        nextTab = activeTab + 1;
+        htmlClass = 'slide-in-left';
+    } else {
+        nextTab = activeTab - 1;
+        htmlClass = 'slide-in-right';
+    }
+
+    for (let i = 0; i < numberOfTabs; i++) {
+        if (i === nextTab) {
+            tabs[i].classList.remove('hide');
+            tabs[i].classList.add(htmlClass);
+        } else {
+            tabs[i].classList.add('hide');
+            tabs[i].classList.remove('slide-in-left', 'slide-in-right');
         }
+    }
+    // tabs.forEach((tab, index) => {
+    //     // loop through all elements that match query selector and only continue for the current active tab
 
-    });
+
+    //     if (tab.id === activeTab.id) {
+    //         tab.classList.remove('slide-in');
+    //         tab.classList.add('slide-out');
+    //         if (type === 'next') {
+    //             tabs[index + 1].classList.remove('hide');
+    //             tabs[index + 1].classList.add('slide-in');
+
+    //         } else if (type === 'prev') {
+    //             tabs[index - 1].classList.remove('hide');
+    //             tabs[index + 1].classList.add('slide-in');
+
+    //         } else {
+    //             console.log('ERROR: Function argument "type" value is not accepted.');
+    //         }
+    //         // now that the new tab is unhidden, hide the active tab
+    //         tab.classList.add('hide');
+
+
+    //     }
+
+    // });
 
     updateNavButtons();
     updateTabIndicator();

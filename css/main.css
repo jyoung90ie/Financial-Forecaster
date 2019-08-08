@@ -19,6 +19,10 @@ body {
     width: 100%;
 }
 
+section {
+    background-color: #778DA9;
+}
+
 .far,
 .fas {
     color: #2A3A4C;
@@ -54,10 +58,82 @@ td {
 }
 
 .hide {
-    transition-duration: 2s;
-    transition-property: all;
-    right: 0;
     display: none;
+}
+
+
+.slide-in-left {
+    animation: slide-in-left 1s forwards;
+    -webkit-animation: slide-in-left 0.5s forwards;
+}
+
+.slide-in-right {
+    animation: slide-in-right 1s backwards;
+    -webkit-animation: slide-in-right 0.5s backwards;
+}
+
+@keyframes slide-in-left {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0%);
+    }
+}
+
+@-webkit-keyframes slide-in-left {
+    0% {
+        -webkit-transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: translateX(0%);
+    }
+}
+
+@keyframes slide-in-right {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes slide-in-right {
+    0% {
+        -webkit-transform: translateX(100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: translateX(0%);
+    }
 }
 
 h2 {
@@ -79,10 +155,7 @@ h2>.far {
     width: 100%;
 }
 
-section[id*='tab'] {
-    animation: ;
 
-}
 
 
 #navigation {
