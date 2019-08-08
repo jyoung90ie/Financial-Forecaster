@@ -24,44 +24,42 @@
             <section id="general-tab" class="hide">
                 <h2><i class="fas fa-user-circle"></i> Personal Details</h2>
                 <div class="form-row">
-                    <div class="form-group col">
-                        <label for="first-name">First Name</label>
+                    <p>Please input your contact details, what your goal is (i.e. to increase savings to X or to
+                        decrease debt to Y), and what currenct you would like to use. </p>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-12 col-md-6">
                         <input type="text" name="first-name" class="form-control form-control-sm" id="first-name"
                             placeholder="First Name">
                     </div>
-                    <div class="form-group col">
-                        <label for="last-name">Last Name</label>
+                    <div class="form-group col-12 col-md-6">
                         <input type="text" name="last-name" class="form-control form-control-sm" id="last-name"
                             placeholder="Last Name">
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group col">
-                        <label for="email">Email Address</label>
+                    <div class="form-group col-12 col-md-6">
                         <input type="text" name="email" class="form-control form-control-sm" id="email"
-                            placeholder="Please provide your email address">
+                            placeholder="Email Address">
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group col">
-                        <label for="goal">Goal</label>
+                    <div class="form-group col-12 col-md-6">
                         <select class="custom-select custom-select-sm" name="goal" id="goal">
                             <option value="">Please select your goal</option>
                             <option value="1">Reduce Debt</option>
                             <option value="2">Increase Savings</option>
                         </select>
                     </div>
-                    <div class="form-group col">
-                        <label for="goal">Goal Amount</label>
+                    <div class="form-group col-12 col-md-6">
                         <input type="text" name="goal-amount" class="form-control form-control-sm" id="goal-amount"
-                            placeholder="Please enter your goal amount">
+                            placeholder="Goal Amount">
                     </div>
                 </div>
                 <div class="form-row">
-                    <div class="form-group col-6">
-                        <label for="currency">Currency</label>
+                    <div class="form-group col-12 col-md-6">
                         <select class="custom-select custom-select-sm" name="currency" id="currency">
-                            <option value="">Please select your goal</option>
+                            <option value="">Please select your preferred currency</option>
                             <option value="1">Currency 1</option>
                             <option value="2">Currency 2</option>
                         </select>
@@ -71,59 +69,61 @@
             <section id="account-tab" class="hide">
                 <h2><i class="fas fa-credit-card"></i> Accounts</h2>
                 <div class="form-row">
-                    <div class="col-3">Account</div>
-                    <div class="col-2">Balance</div>
-                    <div class="col-3">Type</div>
+                    <p>Please enter all of your bank accounts, loans, credit card accounts, etc., and the current
+                        balance of each as they are today.</p>
                 </div>
                 <div class="form-row" id="account-fields-1">
-                    <div class="form-group col-3">
+                    <div class="form-group col-12 col-lg-4">
                         <input type="text" name="account-label-1" class="form-control form-control-sm"
-                            id="account-label-1" placeholder="Name">
+                            id="account-label-1" placeholder="Description">
                     </div>
-                    <div class="form-group col-2">
-                        <input type="text" name="account-amount-1" class="form-control form-control-sm"
-                            id="account-amount-1" placeholder="Amount">
+
+                    <div class="form-group col-12 col-md-5 col-lg-3">
+                        <input type="text" name="account-amount-1" class="form-control form-control-sm col"
+                            id="account-amount-1" placeholder="Account balance">
                     </div>
-                    <div class="form-group col-3">
-                        <select class="custom-select custom-select-sm" name="account-type-1" id="account-type-1">
-                            <option value=""></option>
-                            <option value="1">Current Account</option>
-                            <option value="2">Savings Account</option>
-                            <option value="3">Credit Card</option>
-                            <option value="4">Investments</option>
-                            <option value="5">Other</option>
+                    <div class="form-group col-12 col-md-5 col-lg-4">
+                        <select class="custom-select custom-select-sm" name="account-frequency-1"
+                            id="account-frequency-1">
+                            <option value="">Type of account</option>
+                            <option value="current">Current Account</option>
+                            <option value="saving">Savings Account</option>
+                            <option value="cc">Credit Card</option>
+                            <option value="investment">Investments</option>
+                            <option value="other">Other</option>
                         </select>
                     </div>
-                    <div class="form-group col-1 offset-3 add-remove-btns">
+                    <div class="form-group col-4 col-md-2 col-lg-1 add-remove-btns text-md-right">
                         <a href="#" onclick="addFormRow(this);">
-                            <i class="fas fa-plus"></i>
+                            <i class="fas fa-plus mr-2"></i>
                         </a>
                         <a href="#" onclick="removeFormRow(this);">
                             <i class="far fa-trash-alt"></i>
                         </a>
                     </div>
+                    <div class="input-end"></div>
                 </div>
             </section>
             <section id="income-tab" class="hide">
-                <h2><i class="fas fa-piggy-bank"></i> Regular Income(s)</h2>
+                <h2><i class="fas fa-shopping-basket"></i> Regular Income</h2>
                 <div class="form-row">
-                    <div class="col-3">Label</div>
-                    <div class="col-2">Amount</div>
-                    <div class="col-3">Frequency</div>
+                    <p>Please enter any regular income transactions you have, inputting the
+                        estimated amount and how often they take place.</p>
                 </div>
-                <div class="form-row" id="income-fields-1">
-                    <div class="form-group col-3">
+                <div class="form-row" id="income-fields-1" class="mt-3 mt-md-0">
+                    <div class="form-group col-12 col-lg-4">
                         <input type="text" name="income-label-1" class="form-control form-control-sm"
-                            id="income-label-1" placeholder="Label">
+                            id="income-label-1" placeholder="Description">
                     </div>
-                    <div class="form-group col-2">
-                        <input type="text" name="income-amount-1" class="form-control form-control-sm"
-                            id="income-amount-1" placeholder="Amount">
+
+                    <div class="form-group col-12 col-md-5 col-lg-3">
+                        <input type="text" name="income-amount-1" class="form-control form-control-sm col"
+                            id="income-amount-1" placeholder="Income amount">
                     </div>
-                    <div class="form-group col-3">
+                    <div class="form-group col-12 col-md-5 col-lg-4">
                         <select class="custom-select custom-select-sm" name="income-frequency-1"
                             id="income-frequency-1">
-                            <option value=""></option>
+                            <option value="">How often does this take place</option>
                             <option value="7">Every 1 week</option>
                             <option value="14">Every 2 weeks</option>
                             <option value="28">Every 4 weeks</option>
@@ -131,38 +131,38 @@
                             <option value="60">Every 2 months</option>
                         </select>
                     </div>
-                    <div class="form-group col-1 offset-3 add-remove-btns">
+                    <div class="form-group col-4 col-md-2 col-lg-1 add-remove-btns text-md-right">
                         <a href="#" onclick="addFormRow(this);">
-                            <i class="fas fa-plus"></i>
+                            <i class="fas fa-plus mr-2"></i>
                         </a>
                         <a href="#" onclick="removeFormRow(this);">
                             <i class="far fa-trash-alt"></i>
                         </a>
+
                     </div>
+                    <div class="input-end"></div>
                 </div>
             </section>
             <section id="outgoing-tab" class="hide">
-                <h2><i class="fas fa-shopping-basket"></i> Regularing Outgoing(s)</h2>
+                <h2><i class="fas fa-shopping-basket"></i> Regular Outgoing(s)</h2>
                 <div class="form-row">
-                    <div class="col-3">Label</div>
-                    <div class="col-2">Amount</div>
-                    <div class="col-3">Frequency</div>
-                    <div class="col-3">Type</div>
+                    <p>Please enter any regular outgoing transactions you have, inputting the
+                        estimated amount and how often they take place.</p>
                 </div>
-                <div class="form-row" id="outgoing-fields-1">
-                    <div class="form-group col-3">
+                <div class="form-row" id="outgoing-fields-1" class="mt-3 mt-md-0">
+                    <div class="form-group col-12 col-md-7">
                         <input type="text" name="outgoing-label-1" class="form-control form-control-sm"
-                            id="outgoing-label-1" placeholder="Label">
+                            id="outgoing-label-1" placeholder="Description">
                     </div>
 
-                    <div class="form-group col-2">
+                    <div class="form-group col-md-5">
                         <input type="text" name="outgoing-amount-1" class="form-control form-control-sm"
-                            id="outgoing-amount-1" placeholder="Amount">
+                            id="outgoing-amount-1" placeholder="Outgoing amount">
                     </div>
-                    <div class="form-group col-3">
+                    <div class="form-group col-12 col-md-5">
                         <select class="custom-select custom-select-sm" name="outgoing-frequency-1"
                             id="outgoing-frequency-1">
-                            <option value=""></option>
+                            <option value="">How often does this take place</option>
                             <option value="7">Every 1 week</option>
                             <option value="14">Every 2 weeks</option>
                             <option value="28">Every 4 weeks</option>
@@ -170,24 +170,26 @@
                             <option value="60">Every 2 months</option>
                         </select>
                     </div>
-                    <div class="form-group col-3">
+                    <div class="form-group col-12 col-md-5">
                         <select class="custom-select custom-select-sm" name="outgoing-type-1" id="outgoing-type-1">
-                            <option value=""></option>
-                            <option value="1">Bill</option>
-                            <option value="2">Loan</option>
-                            <option value="3">Credit Card</option>
-                            <option value="4">Rent/Mortgage</option>
-                            <option value="5">Other</option>
+                            <option value="">Type of outgoing transaction</option>
+                            <option value="bill">Bill</option>
+                            <option value="loan">Loan</option>
+                            <option value="cc">Credit Card</option>
+                            <option value="rent">Rent/Mortgage</option>
+                            <option value="other">Other</option>
                         </select>
                     </div>
-                    <div class="form-group col-1 add-remove-btns">
+                    <div class="form-group col-4 col-md-2 add-remove-btns text-md-right">
                         <a href="#" onclick="addFormRow(this);">
-                            <i class="fas fa-plus"></i>
+                            <i class="fas fa-plus mr-2"></i>
                         </a>
                         <a href="#" onclick="removeFormRow(this);">
                             <i class="far fa-trash-alt"></i>
                         </a>
+
                     </div>
+                    <div class="input-end"></div>
                 </div>
             </section>
             <section id="summary-tab" class="hide"></section>
@@ -200,7 +202,7 @@
                     <button type="submit" class="btn btn-primary hide" id="submit-btn">Submit</button>
                 </div>
             </section>
-            <section id="progress-indicator">
+            <section id="progress-indicator" class="d-block">
                 <span class="tab"></span>
                 <span class="tab"></span>
                 <span class="tab"></span>
