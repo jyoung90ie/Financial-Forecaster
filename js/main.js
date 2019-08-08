@@ -1,6 +1,6 @@
 let minRows = 1; // minimum total number of form rows
 let maxRows = 12; // maximum total number of form rows
-let startTab = 0; // first tab = 0
+let startTab = 4; // first tab = 0
 
 let tabIdentifier = 'tab'; // word which identifies all tabs
 
@@ -9,6 +9,7 @@ const nextBtn = document.getElementById('next-btn');
 const submitBtn = document.getElementById('submit-btn');
 const form = document.querySelector('form');
 const summaryTab = document.querySelector('#summary-tab');
+const progressIndicator = document.querySelector('#progress-indicator');
 
 
 const getActiveTab = () => document.querySelectorAll('section[id*="' + tabIdentifier + '"]:not(.hide)')[0];
@@ -33,10 +34,9 @@ const getAttributePrefix = attributeValue => {
     }
 };
 
-function initTab(startTab = 0) {
+const initTab = (startTab = 0) => {
     // function which will set the current tab
     let allTabs = getTabs();
-    let getTabIndicators = document.querySelectorAll('#progress-indicator span');
     let numberOfTabs = allTabs.length;
 
     let maxTab = numberOfTabs - 2; // array starts at zero therefore -1; another -1 as I want the final tab not to be accessible by next button, only by submit button.
@@ -52,101 +52,96 @@ function initTab(startTab = 0) {
     for (let i = 0; i < numberOfTabs; i++) {
         if (i === startTab) {
             allTabs[i].classList.remove('hide');
-            getTabIndicators[i].classList.add('active');
         } else {
             allTabs[i].classList.add('hide');
-            getTabIndicators[i].classList.remove('active');
         }
     }
 
-    nextBtn.classList.remove('hide');
-    prevBtn.classList.remove('hide');
-    submitBtn.classList.remove('hide');
+    updateNavButtons();
+    updateTabIndicator();
+};
 
-    if (startTab === 0) {
-        submitBtn.classList.add('hide');
-        prevBtn.classList.add('hide');
-    } else if (startTab === maxTab) {
-        nextBtn.classList.add('hide');
+const updateNavButtons = () => {
+    const numberOfTabs = getTabs().length - 1;
+    const activeTab = Array.from(getTabs()).indexOf(getActiveTab());
+
+    nextBtn.classList.add('hide');
+    prevBtn.classList.add('hide');
+    submitBtn.classList.add('hide');
+
+    if (activeTab === 0) {
+        // first tab - only show next button
+        nextBtn.classList.remove('hide');
+    } else if (activeTab === numberOfTabs) {
+        // last tab - only show previous button
+        prevBtn.classList.remove('hide');
+    } else if (activeTab === numberOfTabs - 1) {
+        // penultimate tab - show previous and submit buttons
+        prevBtn.classList.remove('hide');
+        submitBtn.classList.remove('hide');
     } else {
-        submitBtn.classList.add('hide');
+        // if none of above, show next and previous
+        nextBtn.classList.remove('hide');
+        prevBtn.classList.remove('hide');
     }
-}
+};
 
 
-function navigateTabs(type) {
+const navigateTabs = type => {
     let activeTab = getActiveTab();
     let tabs = getTabs();
 
-    let getTabIndicators = document.querySelectorAll('#progress-indicator span');
-
     tabs.forEach((tab, index) => {
-
-        let currentTabNumber = index + 1; // need to add one as first array item has index of 0
-        let numberOfTabs = tabs.length; // length of array indicates number of tabs
-
         // loop through all elements that match query selector and only continue for the current active tab
+
         if (tab.id === activeTab.id) {
-            let adjTabNumber;
             if (type === 'next') {
                 tabs[index + 1].classList.remove('hide');
-                adjTabNumber = currentTabNumber + 1;
             } else if (type === 'prev') {
                 tabs[index - 1].classList.remove('hide');
-                adjTabNumber = currentTabNumber - 1;
             } else {
                 console.log('ERROR: Function argument "type" value is not accepted.');
             }
-
-            activeTab.classList.add('hide');
-
-            // buttons to be displayed are based on what the next tab is, i.e. if I clicked the next button whilst on tab 1, then I need to consider what buttons should be shown based on tab 2 - hence adjTabNumber accounts for this
-
-            if (adjTabNumber === 1) {
-                prevBtn.classList.add('hide');
-                nextBtn.classList.remove('hide');
-                submitBtn.classList.add('hide');
-            } else if (adjTabNumber > 1 && adjTabNumber < numberOfTabs - 1) {
-                // show next and previous
-                prevBtn.classList.remove('hide');
-                nextBtn.classList.remove('hide');
-                submitBtn.classList.add('hide');
-            } else if (adjTabNumber === numberOfTabs - 1) {
-                // show prev only
-                prevBtn.classList.remove('hide');
-                nextBtn.classList.add('hide');
-                submitBtn.classList.remove('hide');
-            } else if (adjTabNumber === numberOfTabs) {
-                console.log('test');
-                prevBtn.classList.remove('hide');
-                nextBtn.classList.add('hide');
-                submitBtn.classList.add('hide');
-            } else {
-                // show prev only
-                prevBtn.classList.remove('hide');
-                nextBtn.classList.add('hide');
-                submitBtn.classList.add('hide');
-            }
+            // now that the new tab is unhidden, hide the active tab
+            tab.classList.add('hide');
         }
-    });
-}
 
-function addFormRow(el) {
+    });
+
+    updateNavButtons();
+    updateTabIndicator();
+};
+
+const updateTabIndicator = () => {
+    // determine how many tabs are in the form and use this to add tab indicators for each
+    const numberOfTabs = getTabs().length;
+    const activeTab = Array.from(getTabs()).indexOf(getActiveTab());
+    let progressIndicatorHTML = '';
+
+    for (let i = 0; i < numberOfTabs; i++) {
+        let htmlClass = 'tab';
+        if (i === activeTab) {
+            htmlClass += ' active';
+        }
+        progressIndicatorHTML += `<span class="${htmlClass}"></span>`;
+    }
+
+    progressIndicator.innerHTML = progressIndicatorHTML;
+};
+
+const addFormRow = el => {
     let parentElement = el.parentNode.parentNode
     let element = document.getElementById(parentElement.id);
-    let elementId = element.id;
-    let elementIdPrefix = getAttributePrefix(elementId);
+    let elementIdPrefix = getAttributePrefix(element.id);
 
     let countElements = element.parentNode.querySelectorAll('[id^="' + elementIdPrefix + '"').length;
 
     // check to make sure that there is at least one row before deleting
     if (countElements < maxRows) {
         let idToAppendTo = parentElement.parentNode.id;
-
         let copyHTML = element.cloneNode(true);
 
         // see how many of this id already exist and increment it
-
         let newElementId = elementIdPrefix + parseInt(countElements + 1);
         // change cloned element id to the new incremented value to keep unique
         copyHTML.id = newElementId;
@@ -160,10 +155,10 @@ function addFormRow(el) {
     } else {
         alert("NOTE: You have reached the maximum permittable amount of form rows.");
     }
-}
+};
 
 
-function changeAttributeValues(parentElement, attribute) {
+const changeAttributeValues = (parentElement, attribute) => {
     /*
     Function is invoked when a new form row is added. It will iterate through new form elements and update the relevant attribute values
     to ensure they remain unique (e.g. name and id)
@@ -183,10 +178,10 @@ function changeAttributeValues(parentElement, attribute) {
         childElement.value = "";
         childElement.classList.remove('success', 'fail');
     });
-}
+};
 
 
-function removeFormRow(element) {
+const removeFormRow = element => {
     let parentDiv = element.parentNode.parentNode;
     let parentDivIdPrefix = getAttributePrefix(parentDiv.id);
 
@@ -201,9 +196,9 @@ function removeFormRow(element) {
     } else {
         alert('ERROR: Cannot delete the last form row.');
     }
-}
+};
 
-function elementReindex() {
+const elementReindex = () => {
     /* 
     Runs when a row has been removed.
     */
@@ -251,9 +246,9 @@ function elementReindex() {
     });
 
     processElementReindex(elements);
-}
+};
 
-function processElementReindex(array) {
+const processElementReindex = array => {
     if (array.length === 0) {
         console.log('ERROR: empty array passed to function - cannot proceed');
         return;
@@ -279,15 +274,13 @@ function processElementReindex(array) {
         });
 
     }
-}
+};
 
 
 
-/* 
-
-FORM CALCULATION FUNCTIONS
-
-*/
+/*******************************
+  FORM CALCULATION FUNCTIONS
+*******************************/
 
 
 // function to convert the different form frequencies into a yearly amount
@@ -327,39 +320,7 @@ const validateNumber = text => {
     return pattern.test(text);
 };
 
-// form event listener
-form.addEventListener('change', event => {
-    if (event.target.nodeName === 'INPUT') {
-        if (event.target.id.includes('label')) {
-            if (validateText(event.target.value)) {
-                event.target.classList.add('success');
-                event.target.classList.remove('fail');
-            } else {
-                event.target.classList.add('fail');
-                event.target.classList.remove('success');
-            }
-        } else if (event.target.id.includes('amount')) {
-            if (validateNumber(event.target.value)) {
-                event.target.classList.add('success');
-                event.target.classList.remove('fail');
-            } else {
-                event.target.classList.add('fail');
-                event.target.classList.remove('success');
-            }
-        }
 
-    } else if (event.target.nodeName === 'SELECT') {
-        if (event.target.id.includes('frequency')) {
-            if (event.target.value !== "") {
-                event.target.classList.add('success');
-                event.target.classList.remove('fail');
-            } else {
-                event.target.classList.add('fail');
-                event.target.classList.remove('success');
-            }
-        }
-    }
-});
 
 const filterArray = (data, filter) => {
     let array;
@@ -475,7 +436,7 @@ const netWorthCalc = (accounts, incomes, outgoings, years = 3) => {
 
     summaryTab.innerHTML = `
             <h2>Net Worth after ${years} years</h2>
-            <table class="table text-center">
+            <table class="table table-responsive text-center">
                 <thead>
                     <tr>
                         <th>Year</th>
@@ -491,6 +452,41 @@ const netWorthCalc = (accounts, incomes, outgoings, years = 3) => {
             </table>`;
 
 };
+/*******************************
+   event listeners
+*******************************/
+form.addEventListener('change', event => {
+    if (event.target.nodeName === 'INPUT') {
+        if (event.target.id.includes('label')) {
+            if (validateText(event.target.value)) {
+                event.target.classList.add('success');
+                event.target.classList.remove('fail');
+            } else {
+                event.target.classList.add('fail');
+                event.target.classList.remove('success');
+            }
+        } else if (event.target.id.includes('amount')) {
+            if (validateNumber(event.target.value)) {
+                event.target.classList.add('success');
+                event.target.classList.remove('fail');
+            } else {
+                event.target.classList.add('fail');
+                event.target.classList.remove('success');
+            }
+        }
+
+    } else if (event.target.nodeName === 'SELECT') {
+        if (event.target.id.includes('frequency')) {
+            if (event.target.value !== "") {
+                event.target.classList.add('success');
+                event.target.classList.remove('fail');
+            } else {
+                event.target.classList.add('fail');
+                event.target.classList.remove('success');
+            }
+        }
+    }
+});
 
 form.addEventListener('submit', event => {
     event.preventDefault();
@@ -514,4 +510,4 @@ form.addEventListener('submit', event => {
 
 
 
-initTab(5);
+initTab(startTab);
