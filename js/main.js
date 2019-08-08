@@ -1,6 +1,6 @@
 const minRows = 1; // minimum total number of form rows
 const maxRows = 12; // maximum total number of form rows
-const startTab = 4; // first tab = 0
+const startTab = 3; // first tab = 0
 
 const tabIdentifier = 'tab'; // word which identifies all tabs
 
@@ -13,7 +13,7 @@ const progressIndicator = document.querySelector('#progress-indicator');
 const contentBox = document.querySelector('.content-box');
 
 
-const getActiveTab = () => document.querySelectorAll('section[id*="' + tabIdentifier + '"]:not(.hide)')[0];
+const getActiveTab = () => document.querySelector('section[id*="' + tabIdentifier + '"]:not(.hide)');
 
 const getTabs = () => document.querySelectorAll('section[id*="' + tabIdentifier + '"]');
 
@@ -378,7 +378,12 @@ const numberFormat = num => {
 
 };
 
-
+/*
+    netWorkCalc takes in 3 data arrays and an integer. The function loops through 
+    the data arrays and calculates the cumulative total 
+    for a year. It then repeats this for x number of years and outputs a table 
+    displaying opening balance, yearly income and outgoing, and closing balance.
+*/
 const netWorthCalc = (accounts, incomes, outgoings, years = 3) => {
 
     console.log(accounts);
@@ -455,6 +460,14 @@ const netWorthCalc = (accounts, incomes, outgoings, years = 3) => {
             </table>`;
 
 };
+
+
+const validation = () => {
+    // get all elements on current tab with an 'id' that aren't a div, i.e. form data
+    const elements = getActiveTab().querySelectorAll(':not(div)[id]');
+
+    console.log(elements);
+};
 /*******************************
    event listeners
 *******************************/
@@ -491,51 +504,49 @@ form.addEventListener('change', event => {
     }
 });
 
-// form.addEventListener('submit', event => {
-//     event.preventDefault();
-
-//     const formData = Array.from(form)
-//         .filter(element => element.name !== '')
-//         .map(element => element.name);
-
-//     const accountData = filterArray(formData, 'account');
-//     const incomeData = filterArray(formData, 'income');
-//     const outgoingData = filterArray(formData, 'outgoing');
-
-//     navigateTabs('next');
-//     netWorthCalc(accountData, incomeData, outgoingData, 10);
-// });
-
 form.addEventListener('click', event => {
     // console.log(event);
     const activeTab = getActiveTab();
     const target = event.target;
 
-
+    // navigation button actions
     if (target.id === 'prev-btn') {
         navigateTabs('prev');
     } else if (target.id === 'next-btn') {
+        // const checkTab = validation(activeTab);
+        // validation
+
+
         navigateTabs('next');
     } else if (target.id === 'submit-btn') {
-        event.preventDefault();
+        event.preventDefault(); // do not refresh form
 
+        // create data array by removing any fields without a name
         const formData = Array.from(form)
             .filter(element => element.name !== '')
             .map(element => element.name);
 
+        // split formdata array into specific arrays using function
         const accountData = filterArray(formData, 'account');
         const incomeData = filterArray(formData, 'income');
         const outgoingData = filterArray(formData, 'outgoing');
 
-        navigateTabs('next');
+        // transfer data arrays to function to determine net worth
         netWorthCalc(accountData, incomeData, outgoingData, 10);
-    } else if (target.className.includes('fa-plus')) {
+
+        // transition to the next tab to show results
+        navigateTabs('next');
+    }
+    // add/remove form elements if icons clicked
+    if (target.className.includes('fa-plus')) {
+        // append new row
         const parentID = event.path
             .filter(item => item.nodeName === 'DIV' && item.id !== '')
             .map(item => item.id);
 
         addFormRow(parentID[0]);
     } else if (target.className.includes('fa-trash-alt')) {
+        // remove clicked row
         const parentID = event.path
             .filter(item => item.nodeName === 'DIV' && item.id !== '')
             .map(item => item.id);
@@ -543,7 +554,5 @@ form.addEventListener('click', event => {
         removeFormRow(parentID[0]);
     }
 });
-
-
 
 initTab(startTab);
