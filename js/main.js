@@ -11,6 +11,7 @@ const form = document.querySelector('form');
 const summaryTab = document.querySelector('#summary-tab');
 const progressIndicator = document.querySelector('#progress-indicator');
 const contentBox = document.querySelector('.content-box');
+const error = document.querySelector('#error-messages');
 
 
 const getActiveTab = () => document.querySelector('section[id*="' + tabIdentifier + '"]:not(.hide)');
@@ -117,7 +118,10 @@ const navigateTabs = type => {
 
     updateNavButtons();
     updateTabIndicator();
+    resetErrorMsg();
 };
+
+
 
 const updateTabIndicator = () => {
     // determine how many tabs are in the form and use this to add tab indicators for each
@@ -461,48 +465,122 @@ const netWorthCalc = (accounts, incomes, outgoings, years = 3) => {
 
 };
 
-
-const validation = () => {
+/*
+    validation - runs checks on the active tab of the form to ensure that all tests
+    are passed. If successful the function will invoke the function passed through (i.e. func())
+*/
+const validation = func => {
     // get all elements on current tab with an 'id' that aren't a div, i.e. form data
     const elements = getActiveTab().querySelectorAll(':not(div)[id]');
 
-    console.log(elements);
+    let fails = 0;
+    let emailPattern = /\S+@\S+/;
+    let errorHTML = '';
+
+    elements.forEach(element => {
+        console.log(element.id, element.name);
+        const value = element.value.trim();
+        const id = element.id;
+
+        let nameStr = '';
+
+        // form element names are different on the general tab and need to be handled differently
+        if (getActiveTab().id !== 'general-tab') {
+            nameStr = id.slice(id.indexOf('-') + 1, id.lastIndexOf('-'));
+            console.log(nameStr);
+        } else {
+            nameStr = element.id.replace('-', ' ');
+        }
+
+        const name = nameStr[0].toUpperCase() + nameStr.substr(1).toLowerCase();
+
+
+        element.classList.remove('success', 'fail');
+
+        // check if the element has a value
+        if (!value) {
+            element.classList.add('fail');
+            fails++;
+
+            errorHTML += `<li>The ${name} field must be populated.</li>`;
+        } else {
+            // if a value exists then run some more granular tests based on the form id
+            if (id.includes('email') && !emailPattern.test(value)) {
+                element.classList.add('fail');
+                fails++;
+
+                errorHTML += `<li>You must input a valid email address.</li>`
+            } else if (id.includes('amount') && isNaN(value)) {
+                element.classList.add('fail');
+                fails++;
+                errorHTML += `<li>You must enter a valid number for the field "${name}".</li>`;
+            } else {
+                element.classList.add('success');
+            }
+        }
+    });
+
+    // if all tests were passed then invoke passthrough function
+    if (!fails) {
+        resetErrorMsg();
+        func();
+    } else {
+        let funcName = func.toString();
+        let funcMsg = '';
+
+        if (funcName.includes('navigate')) {
+            funcMsg = `You cannot move on to the next section until you address the following errors:`;
+        } else if (funcName.includes('addform')) {
+            funcMsg = `You cannot add a new form row until you address the following errors:`;
+        } else {
+            funcMsg = `You cannot continue until you address the following errors:`;
+        }
+
+        error.classList.remove('hide');
+        error.innerHTML = `<p>${funcMsg}</p>
+                        <ul>${errorHTML}</ul>`;
+    }
+};
+
+const resetErrorMsg = () => {
+    error.classList.add('hide');
+    error.innerHTML = '';
 };
 /*******************************
    event listeners
 *******************************/
-form.addEventListener('change', event => {
-    if (event.target.nodeName === 'INPUT') {
-        if (event.target.id.includes('label')) {
-            if (validateText(event.target.value)) {
-                event.target.classList.add('success');
-                event.target.classList.remove('fail');
-            } else {
-                event.target.classList.add('fail');
-                event.target.classList.remove('success');
-            }
-        } else if (event.target.id.includes('amount')) {
-            if (validateNumber(event.target.value)) {
-                event.target.classList.add('success');
-                event.target.classList.remove('fail');
-            } else {
-                event.target.classList.add('fail');
-                event.target.classList.remove('success');
-            }
-        }
+// form.addEventListener('change', event => {
+//     if (event.target.nodeName === 'INPUT') {
+//         if (event.target.id.includes('label')) {
+//             if (validateText(event.target.value)) {
+//                 event.target.classList.add('success');
+//                 event.target.classList.remove('fail');
+//             } else {
+//                 event.target.classList.add('fail');
+//                 event.target.classList.remove('success');
+//             }
+//         } else if (event.target.id.includes('amount')) {
+//             if (validateNumber(event.target.value)) {
+//                 event.target.classList.add('success');
+//                 event.target.classList.remove('fail');
+//             } else {
+//                 event.target.classList.add('fail');
+//                 event.target.classList.remove('success');
+//             }
+//         }
 
-    } else if (event.target.nodeName === 'SELECT') {
-        if (event.target.id.includes('frequency')) {
-            if (event.target.value !== "") {
-                event.target.classList.add('success');
-                event.target.classList.remove('fail');
-            } else {
-                event.target.classList.add('fail');
-                event.target.classList.remove('success');
-            }
-        }
-    }
-});
+//     } else if (event.target.nodeName === 'SELECT') {
+//         if (event.target.id.includes('frequency')) {
+//             if (event.target.value !== "") {
+//                 event.target.classList.add('success');
+//                 event.target.classList.remove('fail');
+//             } else {
+//                 event.target.classList.add('fail');
+//                 event.target.classList.remove('success');
+//             }
+//         }
+//     }
+// });
 
 form.addEventListener('click', event => {
     // console.log(event);
@@ -513,11 +591,11 @@ form.addEventListener('click', event => {
     if (target.id === 'prev-btn') {
         navigateTabs('prev');
     } else if (target.id === 'next-btn') {
-        // const checkTab = validation(activeTab);
         // validation
 
+        validation(() => navigateTabs('next'));
 
-        navigateTabs('next');
+        // navigateTabs('next');
     } else if (target.id === 'submit-btn') {
         event.preventDefault(); // do not refresh form
 
@@ -535,7 +613,7 @@ form.addEventListener('click', event => {
         netWorthCalc(accountData, incomeData, outgoingData, 10);
 
         // transition to the next tab to show results
-        navigateTabs('next');
+        validation(() => navigateTabs('next'));
     }
     // add/remove form elements if icons clicked
     if (target.className.includes('fa-plus')) {
@@ -544,7 +622,9 @@ form.addEventListener('click', event => {
             .filter(item => item.nodeName === 'DIV' && item.id !== '')
             .map(item => item.id);
 
-        addFormRow(parentID[0]);
+        validation(() => addFormRow(parentID[0]));
+
+
     } else if (target.className.includes('fa-trash-alt')) {
         // remove clicked row
         const parentID = event.path
