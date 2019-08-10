@@ -1,6 +1,6 @@
 const minRows = 1; // minimum total number of form rows
 const maxRows = 12; // maximum total number of form rows
-const startTab = 3; // first tab = 0
+const startTab = 0; // first tab = 0
 
 const tabIdentifier = 'tab'; // word which identifies all tabs
 
@@ -482,15 +482,18 @@ const validation = func => {
         const value = element.value.trim();
         const id = element.id;
 
-        let nameStr = '';
+
 
         // form element names are different on the general tab and need to be handled differently
-        if (getActiveTab().id !== 'general-tab') {
-            nameStr = id.slice(id.indexOf('-') + 1, id.lastIndexOf('-'));
-            console.log(nameStr);
-        } else {
-            nameStr = element.id.replace('-', ' ');
-        }
+        const nameStr = getActiveTab().id !== 'general-tab' ? id.slice(id.indexOf('-') + 1, id.lastIndexOf('-')) : element.id.replace('-', ' ');
+
+        // let nameStr = '';
+        // if (getActiveTab().id !== 'general-tab') {
+        //     nameStr = id.slice(id.indexOf('-') + 1, id.lastIndexOf('-'));
+        //     console.log(nameStr);
+        // } else {
+        //     nameStr = element.id.replace('-', ' ');
+        // }
 
         const name = nameStr[0].toUpperCase() + nameStr.substr(1).toLowerCase();
 
@@ -549,38 +552,6 @@ const resetErrorMsg = () => {
 /*******************************
    event listeners
 *******************************/
-// form.addEventListener('change', event => {
-//     if (event.target.nodeName === 'INPUT') {
-//         if (event.target.id.includes('label')) {
-//             if (validateText(event.target.value)) {
-//                 event.target.classList.add('success');
-//                 event.target.classList.remove('fail');
-//             } else {
-//                 event.target.classList.add('fail');
-//                 event.target.classList.remove('success');
-//             }
-//         } else if (event.target.id.includes('amount')) {
-//             if (validateNumber(event.target.value)) {
-//                 event.target.classList.add('success');
-//                 event.target.classList.remove('fail');
-//             } else {
-//                 event.target.classList.add('fail');
-//                 event.target.classList.remove('success');
-//             }
-//         }
-
-//     } else if (event.target.nodeName === 'SELECT') {
-//         if (event.target.id.includes('frequency')) {
-//             if (event.target.value !== "") {
-//                 event.target.classList.add('success');
-//                 event.target.classList.remove('fail');
-//             } else {
-//                 event.target.classList.add('fail');
-//                 event.target.classList.remove('success');
-//             }
-//         }
-//     }
-// });
 
 form.addEventListener('click', event => {
     // console.log(event);
