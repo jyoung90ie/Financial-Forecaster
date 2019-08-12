@@ -13,21 +13,19 @@ const progressIndicator = document.querySelector('#progress-indicator');
 const contentBox = document.querySelector('.content-box');
 const error = document.querySelector('#error-messages');
 
+// stores the html element of the current form tab that the user can see
+const getActiveTab = () => document.querySelector(`section[id*="${tabIdentifier}"]:not(.hide)`);
+// stores all of the form tabs in a variable
+const getTabs = () => document.querySelectorAll(`section[id*="${tabIdentifier}"]`);
 
-const getActiveTab = () => document.querySelector('section[id*="' + tabIdentifier + '"]:not(.hide)');
+/*
+    getAttributePrefix: The html attribute values have been setup so that they have a prefix and a suffix. This function returns the prefix only.
 
-const getTabs = () => document.querySelectorAll('section[id*="' + tabIdentifier + '"]');
-
-const pushValuesToArray = (array, ref, elementName, elementAttribute, count) => {
-    array.push({
-        "ref": ref,
-        "prefix": elementName,
-        "attribute": elementAttribute,
-        "count": count,
-        "current": 1
-    });
-};
-
+    E.g.    <input ... name="income-amount-1"...>
+            The 'name' attribute can be split as follows:
+            Prefix  =   "income-amount-"
+            Suffix  =   "1"
+*/
 const getAttributePrefix = attributeValue => {
     if (typeof (attributeValue) == "string") {
         let splitStringPosition = parseInt(attributeValue.lastIndexOf('-')) + 1;
@@ -36,6 +34,14 @@ const getAttributePrefix = attributeValue => {
     }
 };
 
+/*
+    initTab: Initialisation function which is called when the page is first loaded to setup the form.
+
+    The following actions are performed:
+    1. The starting tab is displayed (passed to the function via startTab)
+    2. Navigation buttons are updated based on the starting tab
+    3. The tab indicators are updated to reflect which tab is active
+*/
 const initTab = (startTab = 0) => {
     // function which will set the current tab
     const allTabs = getTabs();
@@ -60,10 +66,17 @@ const initTab = (startTab = 0) => {
         }
     }
 
+    retrieveData();
+    // elementReindex();
     updateNavButtons();
     updateTabIndicator();
 };
 
+/*
+    updateNavButtons:
+
+    Used to determine which buttons should be displayed on each tab, e.g. the first tab should not have a previous button, etc.
+*/
 const updateNavButtons = () => {
     const numberOfTabs = getTabs().length - 1;
     const activeTab = Array.from(getTabs()).indexOf(getActiveTab());
@@ -89,7 +102,14 @@ const updateNavButtons = () => {
     }
 };
 
+/*
+    navigateTabs:
 
+    Used to determine which part of the form should be displayed to the user, dependent on which button they pressed - this is passed to the function via the 'type' variable. 
+    CSS styling is also applied dependent whether the form is moving forwards (next) or backwards (previous).
+
+    Once processed a number of other functions are called to update other elements on the tab (e.g. the buttons that should be shown on the new tab, tab indicators, etc.).
+*/
 const navigateTabs = type => {
     const tabs = Array.from(getTabs());
     const numberOfTabs = tabs.length;
@@ -121,8 +141,11 @@ const navigateTabs = type => {
     resetErrorMsg();
 };
 
+/*
+    updateTabIndicator:
 
-
+    Gives the end user a visual indicator as to their progress through the form by updating the circles at the bottom of the form, with the active tab circle being displayed with a different color to the rest.
+*/
 const updateTabIndicator = () => {
     // determine how many tabs are in the form and use this to add tab indicators for each
     const numberOfTabs = getTabs().length;
@@ -140,11 +163,16 @@ const updateTabIndicator = () => {
     progressIndicator.innerHTML = progressIndicatorHTML;
 };
 
-const addFormRow = elementId => {
-    const element = document.getElementById(elementId);
-    const elementIdPrefix = getAttributePrefix(elementId);
+/*
+    addFormRow:
 
-    const countElements = document.querySelectorAll('[id^="' + elementIdPrefix + '"').length;
+    This takes an elementId as a pass-through variable, this is used to clone the collection of html elements and append to the parent of said element. As this is a clone the html 'id' and 'name' attributes must be updated to maintain their unique values, this is achieved via the changeAttributeValues function.
+*/
+const addFormRow = (id, attr = 'id') => {
+    const element = document.querySelector(`[${attr}^="${id}"]`);
+    const elementPrefix = getAttributePrefix(id);
+
+    const countElements = document.querySelectorAll(`[${attr}^="${getAttributePrefix(id)}"]`).length;
 
     // check to make sure that there is at least one row before deleting
     if (countElements < maxRows) {
@@ -152,7 +180,7 @@ const addFormRow = elementId => {
         let copyHTML = element.cloneNode(true);
 
         // see how many of this id already exist and increment it
-        const newElementId = elementIdPrefix + parseInt(countElements + 1);
+        const newElementId = elementPrefix + parseInt(countElements + 1);
         // change cloned element id to the new incremented value to keep unique
         copyHTML.id = newElementId;
         // execute the clone
@@ -160,18 +188,24 @@ const addFormRow = elementId => {
 
         const newElementChildren = document.getElementById(newElementId);
 
-        changeAttributeValues(newElementChildren, 'name');
-        changeAttributeValues(newElementChildren, 'id');
+        changeAttributeValues(newElementChildren);
+        // changeAttributeValues(newElementChildren);
     } else {
         alert("NOTE: You have reached the maximum permittable amount of form rows.");
     }
 };
 
+/*
+    removeFormRow:
+
+    This takes an elementId as a pass-through variable, which is then used to delete the associated html element and all associated children. Once the row is removed, the element attribute values for id and name need to be updated to ensure that any new rows are not created with the same values as the current.
+*/
+
 const removeFormRow = elementId => {
     const element = document.getElementById(elementId);
     const parentDivIdPrefix = getAttributePrefix(elementId);
 
-    const countRemainingRows = document.querySelectorAll('[id^="' + parentDivIdPrefix + '"]').length;
+    const countRemainingRows = document.querySelectorAll(`[id^="${parentDivIdPrefix}"]`).length;
 
     // check to make sure that there is at least one row before deleting
     if (countRemainingRows > minRows) {
@@ -184,29 +218,57 @@ const removeFormRow = elementId => {
     }
 };
 
+/*
+    changeAttributeValues:
 
-const changeAttributeValues = (parentElement, attribute) => {
+    When a new collection of form elements have been added to the form by cloning the previous elements the attribute values for id and name must be updated so that they are unique. This function performs this adjustment. It works by taking the current attribute value prefixes (i.e. ignoring the integer at the end of the value), determining how many of this value currently exist (including the new one) and appending this to the end as the new value.
+
+*/
+const changeAttributeValues = (parentElement) => {
     /*
     Function is invoked when a new form row is added. It will iterate through new form elements and update the relevant attribute values
     to ensure they remain unique (e.g. name and id)
     */
     // find all elements under parent that need to be relabelled
-    elements = parentElement.querySelectorAll('[' + attribute + ']');
+    attributes = ['id', 'name'];
 
-    elements.forEach(childElement => {
-        let childElementPrefix = getAttributePrefix(childElement[attribute]);
+    attributes.forEach(attr => {
+        elements = parentElement.querySelectorAll(`[${attr}]`);
+        elements.forEach(childElement => {
+            let childElementPrefix = getAttributePrefix(childElement[attr]);
 
-        // get the number of HTML elements with the same attribute name prefix
-        let countAttributeName = document.querySelectorAll('[' + attribute + '^="' + childElementPrefix + '"');
+            // get the number of HTML elements with the same attribute name prefix
+            let countAttributeName = document.querySelectorAll(`[${attr}^="${childElementPrefix}"`);
 
-        // change the attribute value
-        childElement[attribute] = childElementPrefix + countAttributeName.length;
-        // set the new element contents to blank and remove any validation styling
-        childElement.value = "";
-        childElement.classList.remove('success', 'fail');
+            // change the attribute value
+            childElement[attr] = childElementPrefix + countAttributeName.length;
+            // set the new element contents to blank and remove any validation styling
+            childElement.value = "";
+            childElement.classList.remove('success', 'fail');
+        });
     });
 };
 
+/*
+    pushValuesToArray:
+
+    This is used by the elementsReindex function to store the details of all the form elements in which the relevant attributes need to be updated. The array is then processed by the processElementReindex function.
+*/
+const pushValuesToArray = (array, ref, elementName, elementAttribute, count) => {
+    array.push({
+        "ref": ref,
+        "prefix": elementName,
+        "attribute": elementAttribute,
+        "count": count,
+        "current": 1
+    });
+};
+
+/* 
+    elementReindex: 
+    
+    This loops through the form and captures the values of all form elements with an 'id' or a 'name' attribute. It then produces an array of the unique form attributes by only looking at the prefix, this information is then stored in an array and a seperate function (processElementReindex) is called to perform the update.
+*/
 const elementReindex = () => {
     /* 
     Runs when a row has been removed.
@@ -221,20 +283,20 @@ const elementReindex = () => {
     // cycle through the element attributes that need to be reindexed
     let elements = [];
 
-    attributes.forEach(attribute => {
-        let arrayOfElements = document.getElementById(parentID).querySelectorAll('[' + attribute + ']');
+    attributes.forEach(attr => {
+        let arrayOfElements = document.getElementById(parentID).querySelectorAll(`[${attr}]`);
 
         arrayOfElements.forEach(element => {
-            let currentElementAttribute = element[attribute];
+            let currentElementAttribute = element[attr];
             let elementAttributePrefix = getAttributePrefix(currentElementAttribute);
 
-            let ref = "[" + attribute + "]" + elementAttributePrefix;
-            let countOfAttribute = document.getElementById(parentID).querySelectorAll('[' + attribute + '^="' + elementAttributePrefix + '"]').length;
+            let ref = `[${attr}]${elementAttributePrefix}`;
+            let countOfAttribute = document.getElementById(parentID).querySelectorAll(`[${attr}^=${elementAttributePrefix}]`).length;
 
 
             if (elements.length === 0) {
                 // if there array has no values then set first value
-                pushValuesToArray(elements, ref, elementAttributePrefix, attribute, countOfAttribute);
+                pushValuesToArray(elements, ref, elementAttributePrefix, attr, countOfAttribute);
             } else {
                 // if array has at least one value then check the array to make sure the current ref is not already contained
                 let findRefVal = 0;
@@ -248,7 +310,7 @@ const elementReindex = () => {
 
                 // if the ref was not found then add it to the array
                 if (findRefVal === 0) {
-                    pushValuesToArray(elements, ref, elementAttributePrefix, attribute, countOfAttribute);
+                    pushValuesToArray(elements, ref, elementAttributePrefix, attr, countOfAttribute);
                 }
             }
         });
@@ -257,6 +319,11 @@ const elementReindex = () => {
     processElementReindex(elements);
 };
 
+/*
+    processElementReindex:
+
+    This takes in an array as defined by the pushValuesToArray function. This function then loops through the array and updates the element attribute to the new value to ensure that each form element has a unique name and id.
+*/
 const processElementReindex = array => {
     if (array.length === 0) {
         console.log('ERROR: empty array passed to function - cannot proceed');
@@ -264,22 +331,20 @@ const processElementReindex = array => {
     }
 
     for (let i = 0; i < array.length; i++) {
-        let attribute = array[i]["attribute"];
+        let attr = array[i]["attribute"];
         let attributePrefix = array[i]["prefix"];
-        let elements = document.querySelectorAll('[' + attribute + '^="' + attributePrefix + '"]');
+        let elements = document.querySelectorAll(`[${attr}^="${attributePrefix}]`);
 
         elements.forEach(element => {
-            let currentAttributeName = element[attribute];
+            let currentAttributeName = element[attr];
             let attributeCurrent = array[i]["current"];
             let newAttributeName = attributePrefix + attributeCurrent;
 
             if (currentAttributeName !== newAttributeName) {
-                element[attribute] = newAttributeName;
+                element[attr] = newAttributeName;
             }
             array[i]["current"]++;
-
         });
-
     }
 };
 
@@ -288,8 +353,6 @@ const processElementReindex = array => {
 /*******************************
   FORM CALCULATION FUNCTIONS
 *******************************/
-
-
 // function to convert the different form frequencies into a yearly amount
 const getScalar = frequency => {
     let yearScalar;
@@ -328,49 +391,52 @@ const validateNumber = text => {
 };
 
 
+/*
+    createDataArray: used to split the form data into seperate arrays which are consistently structured.
+    E.g. account data, income data, and, outgoing data. These can then be processed individually.
+*/
+const createDataArray = (names, filter) => {
+    let array = [];
 
-const filterArray = (data, filter) => {
-    let array;
-
-    if (typeof data !== 'object') {
-        array = Array.from(data);
+    if (typeof names !== 'object') {
+        array = Array.from(names);
     } else {
-        array = data;
+        array = names;
     }
 
-    const filteredData = array.filter(name => name.includes(filter));
+    const filterArray = array.filter(name => name.includes(filter));
 
-    let newData = [];
+    let dataArray = [];
     let last;
 
-    for (let i = 0; i < filteredData.length; i++) {
-        let item = filteredData[i];
+    for (let i = 0; i < filterArray.length; i++) {
+        let item = filterArray[i];
         let curr = item.substr(item.lastIndexOf('-') + 1) - 1;
 
         if (last === 'undefined') {
             last = curr;
-            newData[curr] = {};
+            dataArray[curr] = {};
         }
 
         if (last !== curr) {
-            newData[curr] = {};
+            dataArray[curr] = {};
         }
 
         if (item.includes('label')) {
-            newData[curr]['label'] = form[item].value;
+            dataArray[curr]['label'] = form[item].value;
         } else if (item.includes('amount')) {
-            newData[curr]['amount'] = Number(form[item].value);
+            dataArray[curr]['amount'] = Number(form[item].value);
         } else if (item.includes('frequency')) {
-            newData[curr]['frequency'] = form[item].value;
+            dataArray[curr]['frequency'] = form[item].value;
         } else if (item.includes('type')) {
-            newData[curr]['type'] = form[item].value;
+            dataArray[curr]['type'] = form[item].value;
         } else {
-            newData[curr][item] = form[item].value;
+            dataArray[curr][item] = form[item].value;
         }
         last = curr;
     }
 
-    return newData;
+    return dataArray;
 };
 
 const numberFormat = num => {
@@ -379,7 +445,6 @@ const numberFormat = num => {
     } else {
         return num;
     }
-
 };
 
 /*
@@ -389,25 +454,13 @@ const numberFormat = num => {
     displaying opening balance, yearly income and outgoing, and closing balance.
 */
 const netWorthCalc = (accounts, incomes, outgoings, years = 3) => {
-
-    console.log(accounts);
-    console.log(incomes);
-    console.log(outgoings);
-
-    let netWorth = 0;
-
-    console.log('net worth after 1 year ----- ');
-
-
     // calculate the total net worth opening position (i.e. total account balance)
-
     const accountsTotal = accounts.reduce((total, account) => {
         total += account.amount;
         return total;
     }, 0);
 
     // calculate the yearly total for income and outgoings
-
     const incomeTotal = incomes.reduce((total, income) => {
         total += income.amount * getScalar(income.frequency);
         return total;
@@ -478,11 +531,8 @@ const validation = func => {
     let errorHTML = '';
 
     elements.forEach(element => {
-        console.log(element.id, element.name);
         const value = element.value.trim();
         const id = element.id;
-
-
 
         // form element names are different on the general tab and need to be handled differently
         const nameStr = getActiveTab().id !== 'general-tab' ? id.slice(id.indexOf('-') + 1, id.lastIndexOf('-')) : element.id.replace('-', ' ');
@@ -525,8 +575,10 @@ const validation = func => {
 
     // if all tests were passed then invoke passthrough function
     if (!fails) {
+        saveData(); // store form values to local data
+
         resetErrorMsg();
-        func();
+        func(); // callback function
     } else {
         let funcName = func.toString();
         let funcMsg = '';
@@ -545,10 +597,81 @@ const validation = func => {
     }
 };
 
+/* 
+    resetErrorMsg: used to hide the error message container and remove the content
+*/
 const resetErrorMsg = () => {
     error.classList.add('hide');
     error.innerHTML = '';
 };
+
+/*
+    getFormData: creates an array of all the form elements which have the 'name' attribute (i.e. all input fields)
+*/
+const getElementNames = () => {
+    return Array.from(form)
+        .filter(element => element.name !== '')
+        .map(element => element.name);
+};
+
+const activeTabElements = () => {
+    return Array.from(form)
+        .filter(element => getActiveTab().contains(element));
+};
+
+/*
+    saveData: used to save form data to local storage
+*/
+const saveData = () => {
+    const elements = activeTabElements();
+
+    elements.forEach(element => {
+        localStorage.setItem(element.name, element.value);
+    });
+};
+
+/*
+    retrieveData: used to retrieve data from local storage and repopulate the form
+*/
+
+const retrieveData = () => {
+
+    const storedItems = Object.keys(localStorage);
+    let toUpdate = [];
+
+    storedItems.forEach(item => {
+        const element = document.querySelector(`[name=${item}]`);
+        const type = item.substr(0, item.indexOf('-'));
+        let lastParent = document.querySelector(`[id^=${type}-fields]`);
+
+        // check if the element exists
+        if (element) {
+            // if it does then retrieve the stored value and prepopulate the form
+            element.value = localStorage.getItem(item);
+            lastParent = element.parentElement.parentElement;
+        } else {
+            // if element does not exist then create it
+            addFormRow(lastParent.id);
+
+            // store element ref and value to array and update it later
+            toUpdate.push({
+                ref: [item],
+                value: localStorage.getItem(item)
+            });
+        }
+    });
+
+    // for those form elements that did not exist and had to be created, retrieve the values and populate
+    toUpdate.forEach(item => {
+        let element = document.querySelector(`[name=${item.ref}]`);
+
+        element.value = item.value;
+    })
+};
+
+
+
+
 /*******************************
    event listeners
 *******************************/
@@ -570,15 +693,13 @@ form.addEventListener('click', event => {
     } else if (target.id === 'submit-btn') {
         event.preventDefault(); // do not refresh form
 
-        // create data array by removing any fields without a name
-        const formData = Array.from(form)
-            .filter(element => element.name !== '')
-            .map(element => element.name);
+        // create an array of form element names by removing any without a name
+        const elementNames = getElementNames();
 
         // split formdata array into specific arrays using function
-        const accountData = filterArray(formData, 'account');
-        const incomeData = filterArray(formData, 'income');
-        const outgoingData = filterArray(formData, 'outgoing');
+        const accountData = createDataArray(elementNames, 'account');
+        const incomeData = createDataArray(elementNames, 'income');
+        const outgoingData = createDataArray(elementNames, 'outgoing');
 
         // transfer data arrays to function to determine net worth
         netWorthCalc(accountData, incomeData, outgoingData, 10);
