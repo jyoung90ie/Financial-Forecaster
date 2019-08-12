@@ -315,8 +315,6 @@ const elementReindex = () => {
             }
         });
     });
-
-    processElementReindex(elements);
 };
 
 /*
@@ -333,7 +331,7 @@ const processElementReindex = array => {
     for (let i = 0; i < array.length; i++) {
         let attr = array[i]["attribute"];
         let attributePrefix = array[i]["prefix"];
-        let elements = document.querySelectorAll(`[${attr}^="${attributePrefix}]`);
+        let elements = document.querySelectorAll(`[${attr}^="${attributePrefix}"]`);
 
         elements.forEach(element => {
             let currentAttributeName = element[attr];
@@ -535,7 +533,7 @@ const validation = func => {
         const id = element.id;
 
         // form element names are different on the general tab and need to be handled differently
-        const nameStr = getActiveTab().id !== 'general-tab' ? id.slice(id.indexOf('-') + 1, id.lastIndexOf('-')) : element.id.replace('-', ' ');
+        const nameStr = getActiveTab().id !== 'general-tab' ? id.slice(id.indexOf('-') + 1, id.lastIndexOf('-')) : element.id.replace(/-/g, ' ');
 
         // let nameStr = '';
         // if (getActiveTab().id !== 'general-tab') {
@@ -545,7 +543,7 @@ const validation = func => {
         //     nameStr = element.id.replace('-', ' ');
         // }
 
-        const name = nameStr[0].toUpperCase() + nameStr.substr(1).toLowerCase();
+        const name = nameStr[0].toUpperCase() + nameStr.substr(1).toLowerCase().replace(/-/g, ' ');
 
 
         element.classList.remove('success', 'fail');
@@ -624,10 +622,27 @@ const activeTabElements = () => {
 */
 const saveData = () => {
     const elements = activeTabElements();
+    let formElements = [];
+
+    let tabNum = Array.from(getTabs()).indexOf(getActiveTab()); // get integer position of tab
 
     elements.forEach(element => {
         localStorage.setItem(element.name, element.value);
+        formElements.push(element.name);
     });
+
+    console.log(formElements);
+    // if tab number > 1 (i.e. from the accounts page onwards)
+    if (tabNum > 1) {
+        const type = elements[0].id.substr(0, elements[0].id.indexOf('-'));
+
+        const storedItems = Object.keys(localStorage);
+        storedItems.forEach(item => {
+            if (item.includes(type) && !formElements.includes(item)) {
+                localStorage.removeItem(item);
+            }
+        });
+    }
 };
 
 /*
