@@ -67,7 +67,6 @@ const initTab = (startTab = 0) => {
     }
 
     retrieveData();
-    // elementReindex();
     updateNavButtons();
     updateTabIndicator();
 };
@@ -80,25 +79,23 @@ const initTab = (startTab = 0) => {
 const updateNavButtons = () => {
     const numberOfTabs = getTabs().length - 1;
     const activeTab = Array.from(getTabs()).indexOf(getActiveTab());
+    const navBtns = document.querySelectorAll('button');
 
-    nextBtn.classList.add('hide');
-    prevBtn.classList.add('hide');
-    submitBtn.classList.add('hide');
+    navBtns.forEach(button => button.classList.add('hide'));
 
-    if (activeTab === 0) {
-        // first tab - only show next button
+    if (activeTab >= 0 && activeTab < numberOfTabs - 1) {
+        // show next button until the penultimate tab - 1
         nextBtn.classList.remove('hide');
-    } else if (activeTab === numberOfTabs) {
-        // last tab - only show previous button
+    }
+
+    if (activeTab > 0 && activeTab <= numberOfTabs) {
+        // show prev button
         prevBtn.classList.remove('hide');
-    } else if (activeTab === numberOfTabs - 1) {
-        // penultimate tab - show previous and submit buttons
-        prevBtn.classList.remove('hide');
+    }
+
+    if (activeTab === numberOfTabs - 1) {
+        // show submit button on penultimate tab
         submitBtn.classList.remove('hide');
-    } else {
-        // if none of above, show next and previous
-        nextBtn.classList.remove('hide');
-        prevBtn.classList.remove('hide');
     }
 };
 
@@ -390,51 +387,50 @@ const validateNumber = text => {
 
 
 /*
-    createDataArray: used to split the form data into seperate arrays which are consistently structured.
-    E.g. account data, income data, and, outgoing data. These can then be processed individually.
+    createDataArray: 
+
+    takes the form inputs as an array input and creates a data array from it
 */
-const createDataArray = (names, filter) => {
-    let array = [];
+const createDataArray = inputData => {
+    let inputArray = [];
+    let outputData = [];
+    let lastRef = '';
+    let j = 0;
 
-    if (typeof names !== 'object') {
-        array = Array.from(names);
+    if (typeof inputData !== 'object') {
+        inputArray = Array.from(inputData);
     } else {
-        array = names;
+        inputArray = inputData;
     }
 
-    const filterArray = array.filter(name => name.includes(filter));
+    for (let i = 0; i < inputArray.length; i++) {
+        let item = inputArray[i];
 
-    let dataArray = [];
-    let last;
+        if (item.includes('account') || item.includes('income') || item.includes('outgoing')) {
+            let source = item.substring(0, item.indexOf('-'));
+            let sourceIndex = item.substring(item.lastIndexOf('-') + 1);
+            let curRef = `${source}-${sourceIndex}`;
+            let fieldName = item.substring(item.indexOf('-') + 1, item.lastIndexOf('-'));
 
-    for (let i = 0; i < filterArray.length; i++) {
-        let item = filterArray[i];
-        let curr = item.substr(item.lastIndexOf('-') + 1) - 1;
+            if (lastRef !== curRef) {
+                if (outputData[j]) {
+                    j++;
+                }
+                outputData[j] = {};
+                outputData[j]['ref'] = curRef;
+                outputData[j]['source'] = source;
+            }
 
-        if (last === 'undefined') {
-            last = curr;
-            dataArray[curr] = {};
+            if (fieldName.includes('amount')) {
+                outputData[j][fieldName] = Number(form[item].value);
+            } else {
+                outputData[j][fieldName] = form[item].value;
+            }
+
+            lastRef = curRef;
         }
-
-        if (last !== curr) {
-            dataArray[curr] = {};
-        }
-
-        if (item.includes('label')) {
-            dataArray[curr]['label'] = form[item].value;
-        } else if (item.includes('amount')) {
-            dataArray[curr]['amount'] = Number(form[item].value);
-        } else if (item.includes('frequency')) {
-            dataArray[curr]['frequency'] = form[item].value;
-        } else if (item.includes('type')) {
-            dataArray[curr]['type'] = form[item].value;
-        } else {
-            dataArray[curr][item] = form[item].value;
-        }
-        last = curr;
     }
-
-    return dataArray;
+    return outputData;
 };
 
 const numberFormat = num => {
@@ -446,75 +442,102 @@ const numberFormat = num => {
 };
 
 /*
-    netWorkCalc takes in 3 data arrays and an integer. The function loops through 
-    the data arrays and calculates the cumulative total 
-    for a year. It then repeats this for x number of years and outputs a table 
-    displaying opening balance, yearly income and outgoing, and closing balance.
+    updateCounter:
+
+    An array is used to keep track of the date that the last income/outgoing value was recorded for each entry, this function is used to update it.
 */
-const netWorthCalc = (accounts, incomes, outgoings, years = 3) => {
-    // calculate the total net worth opening position (i.e. total account balance)
-    const accountsTotal = accounts.reduce((total, account) => {
-        total += account.amount;
-        return total;
-    }, 0);
-
-    // calculate the yearly total for income and outgoings
-    const incomeTotal = incomes.reduce((total, income) => {
-        total += income.amount * getScalar(income.frequency);
-        return total;
-    }, 0);
-
-    const outgoingTotal = outgoings.reduce((total, outgoing) => {
-        total -= outgoing.amount * getScalar(outgoing.frequency);
-        return total;
-    }, 0);
-
-    let netWorthHTML = '';
-    let openingBalance = accountsTotal;
-    let income = incomeTotal;
-    let outgoing = outgoingTotal;
-    let closingBalance = openingBalance + income + outgoing;
-
-    // create summary table for data split by year
-    for (let i = 0; i <= years; i++) {
-        if (i > 0) {
-            openingBalance = accountsTotal + (income + outgoing) * i;
-            closingBalance = openingBalance + (income + outgoing);
-        }
-        if (i === years) {
-            income = '-';
-            outgoing = '-';
-            closingBalance = '-';
-        }
-
-        netWorthHTML += `
-        <tr>
-            <td>${i}</td>
-            <td>${numberFormat(openingBalance)}</td>
-            <td>${numberFormat(income)}</td>
-            <td>${numberFormat(outgoing)}</td>
-            <td>${numberFormat(closingBalance)}</td>
-        </tr>`;
+const updateCounter = (array, key, value) => {
+    if (array.indexOf(key)) {
+        array[key] = value;
+    } else {
+        array.push({
+            [key]: value
+        });
     }
+    return array;
+}
 
-    summaryTab.innerHTML = `
-            <h2>Net Worth after ${years} years</h2>
-            <table class="table table-responsive text-center">
-                <thead>
-                    <tr>
-                        <th>Year</th>
-                        <th>Opening Balance</th>
-                        <th>Income</th>
-                        <th>Outgoings</th>
-                        <th>Closing Balance</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${netWorthHTML}
-                </tbody>
-            </table>`;
+/*
+    genMonthlyData:
 
+    produces a monthly dataset for X years as determined by the passthrough variable
+*/
+const genMonthlyData = (inputData, years = 3) => {
+    const today = new Date();
+    const months = 12;
+    const days = 365.25;
+    const iterations = (days * years);
+    const startDate = today.getTime();
+    const dayTime = 24 * 60 * 60 * 1000; // milliseconds in a day
+    const liabilities = ['liability', 'cc', 'outgoing']; // if inputData source or type contains any of these then the amount should be negative
+
+    let curDate;
+    let counter = [];
+    let outputData = [];
+
+    for (i = 1; i < iterations + 1; i++) {
+        /*
+            [val array variables]
+
+                amount:
+                description:
+                frequency:
+                ref:
+                source:
+                type:
+                end-date: 
+        */
+        let loopData = [];
+
+        inputData.forEach((val, index) => {
+            let amount = 0;
+            if (liabilities.includes(val.source) || liabilities.includes(val.type)) {
+                amount = -val.amount;
+            } else {
+                amount = val.amount;
+            }
+
+            if (curDate === undefined) {
+                loopData.push({
+                    ref: val.ref,
+                    date: startDate,
+                    amount: amount,
+                    description: val.description,
+                    type: val.type
+                });
+                updateCounter(counter, val.ref, startDate);
+            } else {
+                let freq = Number(val.frequency);
+
+                // accounts should only be created at time 0, so only proceed if the source is not account
+                // if frequency === 1 the item is a one off and will have already been accounted for in the initial input
+                if (val.source !== 'account' && freq > 1) {
+                    // check to see when this specific item was last updated and compare to the frequency
+                    let lastUpdated = counter[val.ref];
+                    let daysSinceUpdate = Math.round((curDate - lastUpdated) / dayTime);
+
+                    // if the days since last update is equal to the frequency of updates then push update
+                    if (daysSinceUpdate === freq) {
+                        outputData.push({
+                            ref: val.ref,
+                            date: curDate,
+                            amount: amount,
+                            description: val.description,
+                            type: val.type
+                        });
+                        updateCounter(counter, val.ref, curDate);
+                    }
+                }
+            }
+
+        });
+        curDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i).getTime();
+
+    }
+    return outputData;
 };
+
+
 
 /*
     validation - runs checks on the active tab of the form to ensure that all tests
@@ -535,16 +558,7 @@ const validation = func => {
         // form element names are different on the general tab and need to be handled differently
         const nameStr = getActiveTab().id !== 'general-tab' ? id.slice(id.indexOf('-') + 1, id.lastIndexOf('-')) : element.id.replace(/-/g, ' ');
 
-        // let nameStr = '';
-        // if (getActiveTab().id !== 'general-tab') {
-        //     nameStr = id.slice(id.indexOf('-') + 1, id.lastIndexOf('-'));
-        //     console.log(nameStr);
-        // } else {
-        //     nameStr = element.id.replace('-', ' ');
-        // }
-
         const name = nameStr[0].toUpperCase() + nameStr.substr(1).toLowerCase().replace(/-/g, ' ');
-
 
         element.classList.remove('success', 'fail');
 
@@ -631,7 +645,6 @@ const saveData = () => {
         formElements.push(element.name);
     });
 
-    console.log(formElements);
     // if tab number > 1 (i.e. from the accounts page onwards)
     if (tabNum > 1) {
         const type = elements[0].id.substr(0, elements[0].id.indexOf('-'));
@@ -656,8 +669,7 @@ const retrieveData = () => {
 
     storedItems.forEach(item => {
         const element = document.querySelector(`[name=${item}]`);
-        const type = item.substr(0, item.indexOf('-'));
-        let lastParent = document.querySelector(`[id^=${type}-fields]`);
+        let lastParent;
 
         // check if the element exists
         if (element) {
@@ -665,14 +677,19 @@ const retrieveData = () => {
             element.value = localStorage.getItem(item);
             lastParent = element.parentElement.parentElement;
         } else {
-            // if element does not exist then create it
-            addFormRow(lastParent.id);
+            const type = item.substr(0, item.indexOf('-'));
+            // only continue if type has a string, i.e. it begins with 'name-blahblah' otherwise ignore it
+            if (type !== '') {
+                lastParent = document.querySelector(`[id^=${type}-fields]`);
+                // if element does not exist then create it
+                addFormRow(lastParent.id);
 
-            // store element ref and value to array and update it later
-            toUpdate.push({
-                ref: [item],
-                value: localStorage.getItem(item)
-            });
+                // store element ref and value to array and update it later
+                toUpdate.push({
+                    ref: [item],
+                    value: localStorage.getItem(item)
+                });
+            }
         }
     });
 
@@ -696,50 +713,55 @@ form.addEventListener('click', event => {
     const activeTab = getActiveTab();
     const target = event.target;
 
-    // navigation button actions
-    if (target.id === 'prev-btn') {
-        navigateTabs('prev');
-    } else if (target.id === 'next-btn') {
-        // validation
+    if (target.hasAttribute('class') || target.hasAttribute('id')) {
+        // navigation button actions
+        if (target.id === 'prev-btn') {
+            navigateTabs('prev');
+        } else if (target.id === 'next-btn') {
+            // validation
 
-        validation(() => navigateTabs('next'));
+            validation(() => navigateTabs('next'));
 
-        // navigateTabs('next');
-    } else if (target.id === 'submit-btn') {
-        event.preventDefault(); // do not refresh form
+            // navigateTabs('next');
+        } else if (target.id === 'submit-btn') {
+            event.preventDefault(); // do not refresh form
 
-        // create an array of form element names by removing any without a name
-        const elementNames = getElementNames();
+            // create an array of form element names by removing any without a name
+            const elementNames = getElementNames();
 
-        // split formdata array into specific arrays using function
-        const accountData = createDataArray(elementNames, 'account');
-        const incomeData = createDataArray(elementNames, 'income');
-        const outgoingData = createDataArray(elementNames, 'outgoing');
+            // split formdata array into specific arrays using function
+            const formData = createDataArray(elementNames);
+            const monthlyData = genMonthlyData(formData, 1);
+            makeGraphs(monthlyData);
+            // transfer data arrays to function to determine net worth
+            // netWorthCalc(accountData, incomeData, outgoingData, 10);
 
-        // transfer data arrays to function to determine net worth
-        netWorthCalc(accountData, incomeData, outgoingData, 10);
+            // transition to the next tab to show results
+            validation(() => navigateTabs('next'));
+        }
+        // add/remove form elements if icons clicked
+        if (target.className.includes('fa-plus')) {
+            // append new row
+            const parentID = event.path
+                .filter(item => item.nodeName === 'DIV' && item.id !== '')
+                .map(item => item.id);
 
-        // transition to the next tab to show results
-        validation(() => navigateTabs('next'));
-    }
-    // add/remove form elements if icons clicked
-    if (target.className.includes('fa-plus')) {
-        // append new row
-        const parentID = event.path
-            .filter(item => item.nodeName === 'DIV' && item.id !== '')
-            .map(item => item.id);
-
-        validation(() => addFormRow(parentID[0]));
+            validation(() => addFormRow(parentID[0]));
 
 
-    } else if (target.className.includes('fa-trash-alt')) {
-        // remove clicked row
-        const parentID = event.path
-            .filter(item => item.nodeName === 'DIV' && item.id !== '')
-            .map(item => item.id);
+        } else if (target.className.includes('fa-trash-alt')) {
+            // remove clicked row
+            const parentID = event.path
+                .filter(item => item.nodeName === 'DIV' && item.id !== '')
+                .map(item => item.id);
 
-        removeFormRow(parentID[0]);
+            removeFormRow(parentID[0]);
+
+            // call validation again to refresh error messages (or remove if no longer applicable), pass an empty callback function
+            validation(() => {});
+        }
     }
 });
 
-initTab(startTab);
+// initTab(startTab);
+initTab(5);
