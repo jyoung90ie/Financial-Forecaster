@@ -287,6 +287,8 @@ const pushValuesToArray = (array, ref, elementPrefix, elementAttribute, count) =
     elementReindex:
 
     This loops through the form and captures the values of all form elements with the attributes passed through. It then produces an array of the unique form attributes by only looking at the prefix, this information is then stored in an array and a seperate function (processElementReindex) is called to perform the update.
+
+    clearElement is used to clear formatting and set the value to empty when adding new form rows
 */
 const elementReindex = (clearElement = false, attributes = ['id', 'name']) => {
     /*
@@ -399,14 +401,20 @@ const getScalar = frequency => {
 };
 
 const validateText = text => {
-    const pattern = /^[a-zA-Z0-9 ]{1,30}$/
+    if (text === undefined || text === null) {
+        return false;
+    }
 
+    const pattern = /^[a-zA-Z0-9 *&-\[\]\{\}\(\)]{1,30}$/
     return pattern.test(text);
 };
 
 const validateNumber = text => {
-    const pattern = /^[0-9]+(\.[0-9][0-9]?)?$/
+    if (text === undefined || text === null) {
+        return false;
+    }
 
+    const pattern = /^-?[0-9]+(\.[0-9][0-9]?)?$/
     return pattern.test(text);
 };
 
@@ -497,6 +505,7 @@ const resetErrorMsg = () => {
 
         return true;
     }
+
     return false;
 };
 
