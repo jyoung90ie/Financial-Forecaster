@@ -2,6 +2,37 @@
     Contains the functions used to generate the data for forecasting
 */
 
+/*
+    getElements: creates an array of all the form elements which have the 'name' attribute (i.e. all input fields)
+
+    currentTabFilter: if true this will return only the elements contained on the current tab
+*/
+const getElements = (inputData, currentTabFilter = false) => {
+    if (inputData == undefined) {
+        console.log('getElements(): inputData undefined');
+        return false;
+    }
+
+    let arr;
+    let outputArr;
+
+    if (!isArray(inputData)) {
+        arr = Array.from(inputData);
+    } else {
+        arr = inputData;
+    }
+
+    if (currentTabFilter) {
+        outputArr = arr
+            .filter(element => getActiveTab().contains(element));
+    } else {
+        outputArr = arr
+            .filter(element => element.name !== '')
+            .map(element => element.name);
+    }
+
+    return outputArr;
+};
 
 /*
     createDataArray:
@@ -13,6 +44,11 @@ const createDataArray = inputData => {
     let outputData = [];
     let lastRef = '';
     let j = 0;
+
+    if (inputData === undefined) {
+        console.log('createDataArray(): inputData undefined');
+        return false;
+    }
 
     if (!isArray(inputData)) {
         inputArray = Array.from(inputData);
@@ -108,8 +144,13 @@ const genMonthlyData = (inputData, years = 3) => {
 
         inputData.forEach((val, index) => {
             let amount = 0;
+            /* transform the value to match the type of account and transaction, for example,
+                outgoings should always be negative */
             if (liabilities.includes(val.source) || liabilities.includes(val.type)) {
-                amount = -val.amount;
+                // check that the user hasn't already input the number as a negative
+                if (val.amount > 0) {
+                    amount = -val.amount;
+                }
             } else {
                 amount = val.amount;
             }
@@ -155,28 +196,11 @@ const genMonthlyData = (inputData, years = 3) => {
 };
 
 
-
-
-
-/*
-    getElementNames: creates an array of all the form elements which have the 'name' attribute (i.e. all input fields)
-*/
-const getElementNames = () => {
-    return Array.from(form)
-        .filter(element => element.name !== '')
-        .map(element => element.name);
-};
-
-const activeTabElements = () => {
-    return Array.from(form)
-        .filter(element => getActiveTab().contains(element));
-};
-
 /*
     saveData: used to save form data to local storage
 */
 const saveData = () => {
-    const elements = activeTabElements();
+    const elements = getElements(form, true);
     let formElements = [];
 
     let tabNum = Array.from(getTabs()).indexOf(getActiveTab()); // get integer position of tab
@@ -204,7 +228,6 @@ const saveData = () => {
 */
 
 const retrieveData = () => {
-
     const storedItems = Object.keys(localStorage);
     let toUpdate = [];
 
@@ -212,24 +235,27 @@ const retrieveData = () => {
         const element = document.querySelector(`[name=${item}]`);
         let lastParent;
 
+
         // check if the element exists
         if (element) {
             // if it does then retrieve the stored value and prepopulate the form
             element.value = localStorage.getItem(item);
-            lastParent = element.parentElement.parentElement;
+            lastParent = getTargetNodeID(element, 'DIV');
         } else {
             const type = item.substr(0, item.indexOf('-'));
             // only continue if type has a string, i.e. it begins with 'name-blahblah' otherwise ignore it
             if (type !== '') {
-                lastParent = document.querySelector(`[id^=${type}-fields]`);
+                let elements = document.querySelectorAll(`[id^=${type}-fields]`);
+                lastParent = elements[elements.length - 1].id;
+
                 // if element does not exist then create it
                 if (lastParent) {
-                    addFormRow(lastParent.id);
+                    addFormRow(lastParent);
                 }
 
                 // store element ref and value to array and update it later
                 toUpdate.push({
-                    ref: [item],
+                    ref: item,
                     value: localStorage.getItem(item)
                 });
             }

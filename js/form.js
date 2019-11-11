@@ -32,7 +32,7 @@ const isNumber = val => {
 };
 
 const isArray = val => {
-    return typeof val === 'object';
+    return typeof val === 'object' && val.constructor === Array;
 };
 
 const isString = val => {
@@ -291,48 +291,54 @@ const pushValuesToArray = (array, ref, elementPrefix, elementAttribute, count) =
     clearElement is used to clear formatting and set the value to empty when adding new form rows
 */
 const elementReindex = (clearElement = false, attributes = ['id', 'name']) => {
-    /*
-    Runs when a row has been removed.
-    */
-    let parentElement = getActiveTab();
 
-    if (isArray(attributes) && parentElement) {
+    // let parentTab = getActiveTab();
+    let parentTab = 'financials';
+
+    if (isArray(attributes) && parentTab) {
         // limit the scope of the application to the current tab
-        let parentID = parentElement.id;
+        let parentID = parentTab;
         // cycle through the element attributes that need to be reindexed
         let elements = [];
 
         attributes.forEach(attr => {
             let arrayOfElements = document.getElementById(parentID).querySelectorAll(`[${attr}]`);
 
-            arrayOfElements.forEach(element => {
-                let currentElementAttribute = element[attr];
-                let elementAttributePrefix = getAttributePrefix(currentElementAttribute);
+            if (arrayOfElements) {
+                arrayOfElements.forEach(element => {
+                    let currentElementAttribute = element[attr];
 
-                let ref = `[${attr}]${elementAttributePrefix}`;
-                let countOfAttribute = document.getElementById(parentID).querySelectorAll(`[${attr}^=${elementAttributePrefix}]`).length;
+                    // ignore section tabs
+                    if (currentElementAttribute.includes('tab') || element.nodeName.toLowerCase() == 'section') {
+                        return;
+                    }
 
+                    let elementAttributePrefix = getAttributePrefix(currentElementAttribute);
 
-                if (elements.length === 0) {
-                    // if there array has no values then set first value
-                    pushValuesToArray(elements, ref, elementAttributePrefix, attr, countOfAttribute);
-                } else {
-                    // if array has at least one value then check the array to make sure the current ref is not already contained
-                    let findRefVal = 0;
-                    for (let i = 0; i < elements.length; i++) {
-                        if (elements[i]["ref"] === ref) {
-                            // if the current ref ([attribute]elementprefix) is found set the value to 1 which means that the values will NOT be pushed to the array and end the loop
-                            findRefVal = 1;
-                            break;
+                    let ref = `[${attr}]${elementAttributePrefix}`;
+                    let countOfAttribute = document.getElementById(parentID).querySelectorAll(`[${attr}^=${elementAttributePrefix}]`).length;
+
+                    if (elements.length === 0) {
+                        // if there array has no values then set first value
+                        pushValuesToArray(elements, ref, elementAttributePrefix, attr, countOfAttribute);
+                    } else {
+                        // if array has at least one value then check the array to make sure the current ref is not already contained
+                        let findRefVal = 0;
+                        for (let i = 0; i < elements.length; i++) {
+                            if (elements[i]["ref"] === ref) {
+                                // if the current ref ([attribute]elementprefix) is found set the value to 1 which means that the values will NOT be pushed to the array and end the loop
+                                findRefVal = 1;
+                                break;
+                            }
+                        }
+
+                        // if the ref was not found then add it to the array
+                        if (findRefVal === 0) {
+                            pushValuesToArray(elements, ref, elementAttributePrefix, attr, countOfAttribute);
                         }
                     }
-
-                    // if the ref was not found then add it to the array
-                    if (findRefVal === 0) {
-                        pushValuesToArray(elements, ref, elementAttributePrefix, attr, countOfAttribute);
-                    }
-                }
-            });
+                });
+            }
         });
 
         return processElementReindex(elements, clearElement);

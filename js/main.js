@@ -19,7 +19,7 @@ const error = document.querySelector('#error-messages');
 *******************************/
 if (form) {
     form.addEventListener('click', event => {
-        // console.log(event);
+
         const activeTab = getActiveTab();
         const target = event.target;
 
@@ -37,7 +37,7 @@ if (form) {
                 event.preventDefault(); // do not refresh form
 
                 // create an array of form element names by removing any without a name
-                const elementNames = getElementNames();
+                const elementNames = getElements(form);
 
                 // split formdata array into specific arrays using function
                 const formData = createDataArray(elementNames);
@@ -46,6 +46,9 @@ if (form) {
 
                 // transition to the next tab to show results
                 validation(() => navigateTabs('next'));
+
+                genChart2(monthlyData);
+
             }
             // add/remove form elements if icons clicked
             if (target.className.includes('fa-plus')) {
