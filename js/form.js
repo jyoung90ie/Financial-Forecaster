@@ -26,7 +26,6 @@ const getTabs = () => {
 }
 
 // variable type checks
-
 const isNumber = val => {
     return typeof val === 'number';
 };
@@ -74,7 +73,7 @@ const initTab = (startTab = 0) => {
     const allTabs = getTabs();
     const numberOfTabs = allTabs.length;
 
-    let maxTab = numberOfTabs - 2; // array starts at zero therefore -1; another -1 as I want the final tab not to be accessible by next button, only by submit button.
+    let maxTab = numberOfTabs - 1; // max accessible tab should be maxTab - 1, as last tab should be accessed via submit button and not directly
 
     if (startTab > maxTab) {
         console.log(`ERROR: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(${maxTab}).`);
@@ -93,9 +92,9 @@ const initTab = (startTab = 0) => {
         }
     }
 
-    retrieveData();
     updateNavButtons();
     updateTabIndicator();
+    retrieveData();
 };
 
 /*
@@ -104,7 +103,7 @@ const initTab = (startTab = 0) => {
     Used to determine which buttons should be displayed on each tab, e.g. the first tab should not have a previous button, etc.
 */
 const updateNavButtons = () => {
-    const numberOfTabs = getTabs().length - 1;
+    const numberOfTabs = getTabs().length - 1; // array starts at zero so need to subtract one
     const activeTab = Array.from(getTabs()).indexOf(getActiveTab());
     const navBtns = document.querySelectorAll('button');
 
@@ -217,7 +216,6 @@ const addFormRow = (id, attr = 'id') => {
             const newElementChildren = document.getElementById(newElementId);
 
             if (newElementChildren) {
-                // return changeAttributeValues(newElementChildren);
                 elementReindex(true);
             } else {
                 return false;
@@ -373,7 +371,8 @@ const processElementReindex = (array, clearElement = false) => {
 
                 if (clearElement) {
                     element.value = "";
-                    element.classList.remove('success', 'fail');
+                    // remove validation classes (success, fail) and datepicker class to enable initialisation of new datepicker field
+                    element.classList.remove('success', 'fail', 'hasDatepicker');
                 }
             }
             array[i]["current"]++;
@@ -381,7 +380,11 @@ const processElementReindex = (array, clearElement = false) => {
     }
 };
 
-// function to convert the different form frequencies into a yearly amount
+/*
+    convert the different form frequencies into a yearly amount which is used
+    to generate a dataset
+*/
+
 const getScalar = frequency => {
     let yearScalar;
     switch (frequency) {
@@ -406,6 +409,7 @@ const getScalar = frequency => {
     return yearScalar;
 };
 
+// used to validate form text field inputs
 const validateText = text => {
     if (text === undefined || text === null) {
         return false;
@@ -415,6 +419,7 @@ const validateText = text => {
     return pattern.test(text);
 };
 
+// used to validate form number field inputs
 const validateNumber = text => {
     if (text === undefined || text === null) {
         return false;
@@ -466,6 +471,14 @@ const validation = func => {
                     element.classList.add('fail');
                     fails++;
                     errorHTML += `<li>You must enter a valid number for the field "${name}".</li>`;
+                } else if (id.includes('date')) {
+                    if (startDate && endDate) {
+                        if (startDate >= endDate && id.includes('start')) {
+                            element.classList.add('fail');
+                            fails++;
+                            errorHTML += `<li>Start date must take place before the end date.</li>`;
+                        }
+                    }
                 } else {
                     element.classList.add('success');
                 }
