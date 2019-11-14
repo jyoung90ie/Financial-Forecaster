@@ -153,6 +153,10 @@ h2>.far {
 }
 
 
+input[readonly] {
+  background-color: white  !important;
+}
+
 
 
 #navigation {
@@ -196,4 +200,42 @@ h2>.far {
 
 #navigation {
     padding-bottom: 10px;
+}
+
+.tooltip {
+    opacity: 0.5;
+    background-color: #0D1B2A;
+    padding: 5px 10px 5px 10px;
+    font-size: 12px;
+    border-radius: 15px;
+    
+}
+
+.tooltip .header {
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 1px dashed #ccc;
+    margin: 2px 0 4px 0;
+}
+
+.tooltip .body {
+    margin-left: 4px;
+    line-height: 2;
+}
+
+.tooltip .footer {
+    padding: 0;
+    margin: 4px 0 2px 0;
+    border-top: 1px dashed #ccc;
+    font-size: 13px;
+}
+
+.line {
+    fill: none;
+    stroke: #0D1B2A;
+    stroke-width: 2;
+}
+
+.cricle {
+    stroke: #0D1B2A;
 }

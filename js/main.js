@@ -12,8 +12,9 @@ const summaryTab = document.querySelector('#summary-tab');
 const progressIndicator = document.querySelector('#progress-indicator');
 const contentBox = document.querySelector('.content-box');
 const error = document.querySelector('#error-messages');
+const outputTxt = document.querySelector('.summary-txt');
 
-
+let startDate, endDate;
 /*******************************
   event listener used to determine what was clicked on the form
 *******************************/
@@ -23,16 +24,28 @@ if (form) {
         const activeTab = getActiveTab();
         const target = event.target;
 
+        // dates are captured in the format mm-dd-yyyy and need to be converted
+        const fStartDate = document.querySelector('#start-date').value;
+        const fEndDate = document.querySelector('#end-date').value;
+
+        if (fStartDate && fEndDate) {
+            // convert html inputs to js dates
+            startDate = fStartDate.split("/");
+            endDate = fEndDate.split("/");
+
+            startDate = new Date(startDate[2], startDate[1] - 1, startDate[0]);
+            endDate = new Date(endDate[2], endDate[1] - 1, endDate[0]);
+        }
+
+
         if (target.hasAttribute('class') || target.hasAttribute('id')) {
             // navigation button actions
             if (target.id === 'prev-btn') {
                 navigateTabs('prev');
             } else if (target.id === 'next-btn') {
                 // validation
-
                 validation(() => navigateTabs('next'));
 
-                // navigateTabs('next');
             } else if (target.id === 'submit-btn') {
                 event.preventDefault(); // do not refresh form
 
@@ -41,14 +54,24 @@ if (form) {
 
                 // split formdata array into specific arrays using function
                 const formData = createDataArray(elementNames);
-                const monthlyData = genMonthlyData(formData, 1);
-                console.log(monthlyData);
+                const monthlyData = genMonthlyData(formData, startDate, endDate);
 
                 // transition to the next tab to show results
                 validation(() => navigateTabs('next'));
 
-                genChart2(monthlyData);
+                // produce networth chart using d3
+                genChart(monthlyData);
 
+                // create an array with only the value amounts for transactions that take place on the start date
+                const startingTrans = monthlyData.filter(d => d.date == monthlyData[0].date).map(d => d.amount);
+
+                // sum the amounts from startingTrans to produce opening net worth figure
+                const startNw = startingTrans.reduce((acc, val) => acc + val);
+                const endNw = monthlyData[monthlyData.length - 1].nw;
+
+                const differenceNw = endNw - startNw;
+
+                outputTxt.innerHTML = `Based on the information you have inputted, your net worth has changed by ${differenceNw.toLocaleString()}.`;
             }
             // add/remove form elements if icons clicked
             if (target.className.includes('fa-plus')) {
@@ -66,11 +89,37 @@ if (form) {
                 removeFormRow(parentID);
 
                 // call validation again to refresh error messages (or remove if no longer applicable), pass an empty callback function
-                validation(() => {});
+                validation(() => { });
             }
         }
     });
 }
 
-// initTab(startTab);
-initTab(5);
+
+
+// datepicker format
+let dFormat = 'dd/mm/yy';
+
+// initialise datepicker
+//$( function() {
+//    $("#start-date").datepicker();
+//
+//    $("#end-date").datepicker({
+//        defaultDate: +365,
+//    });
+//} );
+
+// initialise datepicker if input field has class 'datepicker'
+$(document).ready(function () {
+    $(document).on("focus", ".datepicker", function () {
+        $(this).datepicker();
+    });
+});
+
+$.datepicker.setDefaults({
+    dateFormat: dFormat,
+    changeMonth: true,
+    changeYear: true
+});
+
+initTab(4);
