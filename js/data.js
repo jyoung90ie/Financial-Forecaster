@@ -3,7 +3,8 @@
 */
 
 /*
-    getElements: creates an array of all the form elements which have the 'name' attribute (i.e. all input fields)
+    getElements: creates an array of all the form elements which have the 'name' attribute (i.e. form input fields)
+    or are part of the active tab.
 
     currentTabFilter: if true this will return only the elements contained on the current tab
 */
@@ -95,106 +96,118 @@ const numberFormat = num => {
 };
 
 /*
-    updateCounter:
-
-    An array is used to keep track of the date that the last income/outgoing value was recorded for each entry, this function is used to update it.
-*/
-const updateCounter = (array, key, value) => {
-    if (array.indexOf(key)) {
-        array[key] = value;
-    } else {
-        array.push({
-            [key]: value
-        });
-    }
-    return array;
-}
-
-/*
     genMonthlyData:
 
     produces a monthly dataset for X years as determined by the passthrough variable
 */
-const genMonthlyData = (inputData, years = 3) => {
-    const today = new Date();
-    const months = 12;
-    const days = 365.25;
-    const iterations = (days * years);
-    const startDate = today.getTime();
+const updateDataArray = (dataArray, ref, date, amount, description, type) => {
+    dataArray.push({ ref, date, amount, description, type });
+    return dataArray;
+}
+
+
+const genMonthlyData = (inputData, startDate, endDate) => {
+    // calculate the number of days between the start and end dates
     const dayTime = 24 * 60 * 60 * 1000; // milliseconds in a day
+    const amountOfDays = (endDate.getTime() - startDate.getTime()) / (dayTime) // number of days between two dates, this is used as number of iterations    
+
     const liabilities = ['liability', 'cc', 'outgoing']; // if inputData source or type contains any of these then the amount should be negative
 
-    let curDate;
-    let counter = [];
-    let outputData = [];
+    let dataArray = [];
+    let nw = 0;
 
-    for (i = 1; i < iterations + 1; i++) {
-        /*
-            [val array variables]
+    inputData.forEach(formInput => {
+        let amount = formInput.amount;
+        let ref = formInput.ref;
+        let desc = formInput.description;
+        let type = formInput.type;
+        let source = formInput.source;
+        let freq = formInput.frequency;
 
-                amount:
-                description:
-                frequency:
-                ref:
-                source:
-                type:
-                end-date:
-        */
-        let loopData = [];
+        // convert startDate to timestamp
+        let date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
+        
+        /* if the ref/type indicates this is an outgoing amount and the input amount is positive, transfer to negative amount */
+        if (liabilities.includes(source) || liabilities.includes(type)
+            && amount > 0) {
+            // check that the user hasn't already input the number as a negative
+            amount = -1 * amount;
+        }
 
-        inputData.forEach((val, index) => {
-            let amount = 0;
-            /* transform the value to match the type of account and transaction, for example,
-                outgoings should always be negative */
-            if (liabilities.includes(val.source) || liabilities.includes(val.type)) {
-                // check that the user hasn't already input the number as a negative
-                if (val.amount > 0) {
-                    amount = -val.amount;
-                }
+        // for adding account entries (i.e. starting balance) and one-off transactions
+        if (formInput.source.includes('account')) {
+            // check if dataArray has any values
+            // if empty, create first record
+            if (dataArray.length == 0) {
+                ref = 'starting-balance';
+                desc = 'Account balance at opening';
+                type = 'account';
+
+                updateDataArray(dataArray, ref, date, amount, desc, type);
             } else {
-                amount = val.amount;
+                // update the first entry
+                dataArray[0].amount += amount;
             }
+            return;
+        }
 
+        // need to account for one off transactions
+        if (formInput.frequency == 'once') {
+            desc = formInput.description + ' [one-off]';
+            date += dayTime * 14; // date = startDate + 14 days 
+
+            updateDataArray(dataArray, ref, date, amount, desc, type);
+            return;
+        }
+
+        // if it has got to this point then the frequency will be an integer
+        freq = parseInt(freq);
+
+        // for recurring transactins
+        let curDate;
+        let daysSinceUpdate;
+
+        for (i = 1; i < amountOfDays + 1; i++) {
             if (curDate === undefined) {
-                loopData.push({
-                    ref: val.ref,
-                    date: startDate,
-                    amount: amount,
-                    description: val.description,
-                    type: val.type
-                });
-                updateCounter(counter, val.ref, startDate);
+                // first time this item has been entered
+                // first entry date will be on (1 month - 1 day) after the start date
+                curDate = new Date(startDate.getFullYear(), startDate.getMonth() + 1, startDate.getDate() - 1).getTime();
+
+                updateDataArray(dataArray, ref, curDate, amount, desc, type);
+                daysSinceUpdate = 0;
             } else {
-                let freq = Number(val.frequency);
+                curDate += dayTime;
 
-                // accounts should only be created at time 0, so only proceed if the source is not account
-                // if frequency === 1 the item is a one off and will have already been accounted for in the initial input
-                if (val.source !== 'account' && freq > 1) {
-                    // check to see when this specific item was last updated and compare to the frequency
-                    let lastUpdated = counter[val.ref];
-                    let daysSinceUpdate = Math.round((curDate - lastUpdated) / dayTime);
+                // if the days since last update is equal to the frequency of updates then push update
+                if (daysSinceUpdate === freq) {
+                    updateDataArray(dataArray, ref, curDate, amount, desc, type);
 
-                    // if the days since last update is equal to the frequency of updates then push update
-                    if (daysSinceUpdate === freq) {
-                        outputData.push({
-                            ref: val.ref,
-                            date: curDate,
-                            amount: amount,
-                            description: val.description,
-                            type: val.type
-                        });
-                        updateCounter(counter, val.ref, curDate);
-                    }
+                    daysSinceUpdate = 0; // reset days counter
+                } else {
+                    daysSinceUpdate += 1; // increment days counter
                 }
             }
+        };
+    });
 
-        });
-        curDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i).getTime();
+    // sort array by date
+    dataArray.sort((a, b) => a.date - b.date);
 
-    }
+    // now array is sorted, add networth field (nw)
+    let outputData = dataArray.map(d => {
+        nw += d.amount;
+        return {
+            amount: +d.amount,
+            date: d.date,
+            description: d.description,
+            ref: d.ref,
+            type: d.type,
+            nw: nw
+        }
+    });
+
     return outputData;
 };
-
 
 /*
     saveData: used to save form data to local storage
@@ -210,8 +223,8 @@ const saveData = () => {
         formElements.push(element.name);
     });
 
-    // if tab number > 1 (i.e. from the accounts page onwards)
-    if (tabNum > 1) {
+    // if tab number > 0 (i.e. from the accounts page onwards)
+    if (tabNum > 0) {
         const type = elements[0].id.substr(0, elements[0].id.indexOf('-'));
 
         const storedItems = Object.keys(localStorage);

@@ -59,8 +59,12 @@ chart.call(tooltip);
 // generate d3 chart
 const genChart = (data) => {
     // set axes domains
+    console.log(d3.extent(data, d => new Date(d.date)));
     x.domain(d3.extent(data, d => new Date(d.date)));
-    y.domain(d3.extent(data, d => parseInt(d.nw)));
+    y.domain([
+            Math.min(d3.min(data, d => parseInt(d.nw)), 0), 
+            d3.max(data, d => parseInt(d.nw))
+            ]);
 
     console.log(data);
 

@@ -100,15 +100,6 @@ if (form) {
 // datepicker format
 let dFormat = 'dd/mm/yy';
 
-// initialise datepicker
-//$( function() {
-//    $("#start-date").datepicker();
-//
-//    $("#end-date").datepicker({
-//        defaultDate: +365,
-//    });
-//} );
-
 // initialise datepicker if input field has class 'datepicker'
 $(document).ready(function () {
     $(document).on("focus", ".datepicker", function () {
