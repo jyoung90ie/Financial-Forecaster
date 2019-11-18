@@ -34,7 +34,7 @@ or just hosted elsewhere online and can be in any format that is viewable inside
 ## Features
 
 ### Existing Features
-- Dynamical Forms - the user can add and remove input fields to match their requirements (e.g. for accounts )
+- Dynamic Forms - the user can add and remove input fields to match their requirements (e.g. for accounts )
 - One Page Form - the form is one page of HTML and is made to look like seperate pages through the use of CSS and 
 Javascript
 - Transitions - CSS transitions are used to improve the user experience and visually indicate the direction of travel
@@ -46,9 +46,10 @@ processing
 - Net Worth - the data provided by the user is converted into a time-series data object which is then used to output 
 the relevant net worth information over time. For example the user can determine their net worth at the point-in-time 
 X, not just at the end of the time period.
+- Net Worth Chart - Using D3.js a chart is produced showing the evolution of the user's net worth over the time 
+period specified.
 
 ### Features Left to Implement
-- D3 charting
 - Multiple currencies
 - Optional start and end dates for Income/Outgoing(s)
 
