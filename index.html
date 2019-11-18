@@ -19,9 +19,12 @@
 		<form class="m-2">
 			<section id="intro-tab">
 				<h2><i class="fas fa-home"></i> Welcome</h2>
-				<p>Introduction Text</p>
-				<p>Some more text</p>
-				<p>Final text</p>
+				<p>This tool has been designed to help you project your current finances and determine where you will be
+					at the end of a specified time period.</p>
+				<p>In order to do this a number of user inputs are required. Namely, current savings and debt, regular
+					income and outgoings, and a start and end date.</p>
+				<p>To get started please click next and input the requested data. Should you require additional input
+					fields, you can add and remove as necessary on the relevant input pages.</p>
 			</section>
 			<section id="general-tab" class="hide">
 				<h2><i class="fas fa-user-circle"></i> Personal Details</h2>
@@ -45,16 +48,19 @@
 								<label for="first-name">Email Address</label>
 								<input type="text" name="email" class="form-control form-control-sm" id="email"
                             placeholder="Email Address">
-                    </div>
+                        </div>
 							</div>
 							<div class="form-row">
 								<div class="form-group col-12 col-md-6">
 									<label for="start-date">Start Date</label>
-									<input type="text" name="start-date" class="form-control form-control-sm datepicker" id="start-date" readonly="readonly">
+									<input type="text" name="start-date" class="form-control form-control-sm datepicker"
+                                        id="start-date" readonly="readonly">
                     </div>
 									<div class="form-group col-12 col-md-6">
 										<label for="end-date">End Date</label>
-										<input type="text" name="end-date" class="form-control form-control-sm datepicker" id="end-date" readonly="readonly">
+										<input type="text" name="end-date"
+                                            class="form-control form-control-sm datepicker" id="end-date"
+                                            readonly="readonly">
                     </div>
 									</div>
 			</section>
@@ -79,10 +85,11 @@
                         </div>
 								<div class="form-group col-12 col-md-5 col-lg-4">
 									<label for="account-type-1">Description</label>
-									<select class="custom-select custom-select-sm" name="account-type-1" id="account-type-1">
+									<select class="custom-select custom-select-sm" name="account-type-1"
+                                        id="account-type-1">
                                 <option value="">Type of account</option>
-                                <option value="asset">Asset</option>
-                                <option value="liability">Liability (Debt)</option>
+                                <option value="asset">Asset (e.g. Savings)</option>
+                                <option value="liability">Liability (e.g. Debt)</option>
                             </select>
 								</div>
 								<div class="form-group col-4 col-md-2 col-lg-1 add-remove-btns text-md-right">
@@ -119,7 +126,7 @@
 									<label for="income-frequency-1">Frequency</label>
 									<select class="custom-select custom-select-sm" name="income-frequency-1"
                                 id="income-frequency-1">
-                                <option value=""></option>
+                                <option value="">How often does this take place</option>
                                 <option value="once">One off</option>
                                 <option value="7">Every 1 week</option>
                                 <option value="14">Every 2 weeks</option>
@@ -174,7 +181,8 @@
 								</div>
 								<div class="form-group col-12 col-md-5">
 									<label for="outgoing-type-1">Type</label>
-									<select class="custom-select custom-select-sm" name="outgoing-type-1" id="outgoing-type-1">
+									<select class="custom-select custom-select-sm" name="outgoing-type-1"
+                                        id="outgoing-type-1">
                                 <option value="">Type of outgoing transaction</option>
                                 <option value="bill">Bill</option>
                                 <option value="loan">Loan</option>
@@ -191,7 +199,6 @@
 										<a href="#">
 											<i class="far fa-trash-alt"></i>
 										</a>
-
 									</div>
 									<div class="input-end"></div>
 								</div>
@@ -216,15 +223,12 @@
 		</form>
 	</main>
 
-
-
-	<!-- <script src="https://code.jquery.com/jquery-3.4.1.min.js"
-        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>  -->
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/5.12.0/d3.min.js"
 		integrity="sha256-+9Mf3cAVmxxudDsr1XwXUeRZFtvdWVYdq5/vcgiYyNU=" crossorigin="anonymous"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/d3-tip/0.9.1/d3-tip.js"></script>
 	<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
 	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+	<!-- include user scripts -->
 	<script src="js/form.js"></script>
 	<script src="js/data.js"></script>
 	<script src="js/charts.js"></script>

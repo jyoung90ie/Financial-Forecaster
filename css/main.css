@@ -49,7 +49,6 @@ td {
 }
 
 .btn-primary:hover {
-
     background-color: #2A3A4C;
     border: 0;
 }
@@ -58,6 +57,7 @@ td {
     display: none;
 }
 
+/* transitions to make the UX more natural */
 
 .slide-in-left {
     animation: slide-in-left 1s forwards;
@@ -152,17 +152,14 @@ h2>.far {
     width: 100%;
 }
 
-
+/* format the datepicker fields the same as the other form fields */
 input[readonly] {
   background-color: white  !important;
 }
 
-
-
 #navigation {
     float: right;
 }
-
 
 .add-remove-btns {
     font-size: 21px;
@@ -202,6 +199,8 @@ input[readonly] {
     padding-bottom: 10px;
 }
 
+/* d3 chart styling */
+
 .tooltip {
     opacity: 0.5;
     background-color: #0D1B2A;
@@ -236,6 +235,6 @@ input[readonly] {
     stroke-width: 2;
 }
 
-.cricle {
+.circle {
     stroke: #0D1B2A;
 }

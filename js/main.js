@@ -71,7 +71,8 @@ if (form) {
 
                 const differenceNw = endNw - startNw;
 
-                outputTxt.innerHTML = `Based on the information you have inputted, your net worth has changed by ${differenceNw.toLocaleString()}.`;
+                outputTxt.innerHTML = `Based on the information you have inputted, your net worth has changed by 
+                ${differenceNw.toLocaleString()}.`;
             }
             // add/remove form elements if icons clicked
             if (target.className.includes('fa-plus')) {
@@ -88,7 +89,8 @@ if (form) {
                 const parentID = getTargetNodeID(target, 'DIV');
                 removeFormRow(parentID);
 
-                // call validation again to refresh error messages (or remove if no longer applicable), pass an empty callback function
+                // call validation again to refresh error messages (or remove if no longer applicable), 
+                // pass an empty callback function
                 validation(() => { });
             }
         }
@@ -113,4 +115,4 @@ $.datepicker.setDefaults({
     changeYear: true
 });
 
-initTab(4);
+initTab(startTab);

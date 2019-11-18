@@ -126,7 +126,7 @@ const genMonthlyData = (inputData, startDate, endDate) => {
 
         // convert startDate to timestamp
         let date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
-        
+
         /* if the ref/type indicates this is an outgoing amount and the input amount is positive, transfer to negative amount */
         if (liabilities.includes(source) || liabilities.includes(type)
             && amount > 0) {

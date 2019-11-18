@@ -4,7 +4,7 @@ describe("Form functionality", () => {
     describe("isNumber()", () => {
         it("Passing numbers should be true", () => {
             expect(isNumber(1)).toBe(true);
-            expect(isNumber((1-2))).toBe(true);
+            expect(isNumber((1 - 2))).toBe(true);
             expect(isNumber(1.432)).toBe(true);
         });
         it("Passing values which are not numbers should be false", () => {
@@ -70,11 +70,13 @@ describe("Form functionality", () => {
 
             let arr = [];
 
-            let arr2 = [{"ref": 'test',
-                        "prefix": 'test-',
-                        "attribute": 'name',
-                        "count": 1,
-                        "current": 1}];
+            let arr2 = [{
+                "ref": 'test',
+                "prefix": 'test-',
+                "attribute": 'name',
+                "count": 1,
+                "current": 1
+            }];
 
             expect(pushValuesToArray(arr, 'test', 'test-', 'name', 1)).toEqual(arr2);
         });
@@ -83,7 +85,7 @@ describe("Form functionality", () => {
             expect(pushValuesToArray('', 'test', 'test-', 'name', 1)).toEqual(false);
             expect(pushValuesToArray('', '', 'test-', 'name', 1)).toEqual(false);
             expect(pushValuesToArray()).toEqual(false);
-            expect(pushValuesToArray([],12,34,56,78)).toEqual(false);
+            expect(pushValuesToArray([], 12, 34, 56, 78)).toEqual(false);
         });
     });
 
@@ -151,7 +153,7 @@ describe("Form functionality", () => {
     describe("validateNumber()", () => {
         it("Passing numbers should be true", () => {
             expect(validateNumber(1)).toBe(true);
-            expect(validateNumber((1-2))).toBe(true);
+            expect(validateNumber((1 - 2))).toBe(true);
             expect(validateNumber(1.43)).toBe(true);
             expect(validateNumber(-1000)).toBe(true);
             expect(validateNumber('1000')).toBe(true);

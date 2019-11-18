@@ -5,7 +5,7 @@
 
 // stores the html element of the current form tab that the user can see
 const getActiveTab = () => {
-    let tab =  document.querySelector(`section[id*="${tabIdentifier}"]:not(.hide)`);;
+    let tab = document.querySelector(`section[id*="${tabIdentifier}"]:not(.hide)`);;
 
     if (tab) {
         return tab;
@@ -16,7 +16,7 @@ const getActiveTab = () => {
 
 // stores all of the form tabs in a variable
 const getTabs = () => {
-    let tabs =  document.querySelectorAll(`section[id*="${tabIdentifier}"]`);
+    let tabs = document.querySelectorAll(`section[id*="${tabIdentifier}"]`);
 
     if (tabs) {
         return tabs;
@@ -39,7 +39,8 @@ const isString = val => {
 };
 
 /*
-    getAttributePrefix: The html attribute values have been setup so that they have a prefix and a suffix. This function returns the prefix only.
+    getAttributePrefix: The html attribute values have been setup so that they have a prefix and a suffix. This function 
+    returns the prefix only.
 
     E.g.    <input ... name="income-amount-1"...>
             The 'name' attribute can be split as follows:
@@ -73,7 +74,8 @@ const initTab = (startTab = 0) => {
     const allTabs = getTabs();
     const numberOfTabs = allTabs.length;
 
-    let maxTab = numberOfTabs - 1; // max accessible tab should be maxTab - 1, as last tab should be accessed via submit button and not directly
+    // max accessible tab should be maxTab - 1, as last tab should be accessed via submit button and not directly
+    let maxTab = numberOfTabs - 1;
 
     if (startTab > maxTab) {
         console.log(`ERROR: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(${maxTab}).`);
@@ -100,7 +102,8 @@ const initTab = (startTab = 0) => {
 /*
     updateNavButtons:
 
-    Used to determine which buttons should be displayed on each tab, e.g. the first tab should not have a previous button, etc.
+    Used to determine which buttons should be displayed on each tab, e.g. the first tab should not have a previous 
+    button, etc.
 */
 const updateNavButtons = () => {
     const numberOfTabs = getTabs().length - 1; // array starts at zero so need to subtract one
@@ -128,10 +131,12 @@ const updateNavButtons = () => {
 /*
     navigateTabs:
 
-    Used to determine which part of the form should be displayed to the user, dependent on which button they pressed - this is passed to the function via the 'type' variable.
+    Used to determine which part of the form should be displayed to the user, dependent on which button they pressed 
+    - this is passed to the function via the 'type' variable.
     CSS styling is also applied dependent whether the form is moving forwards (next) or backwards (previous).
 
-    Once processed a number of other functions are called to update other elements on the tab (e.g. the buttons that should be shown on the new tab, tab indicators, etc.).
+    Once processed a number of other functions are called to update other elements on the tab (e.g. the buttons that 
+    should be shown on the new tab, tab indicators, etc.).
 */
 const navigateTabs = type => {
     const tabs = Array.from(getTabs());
@@ -167,7 +172,8 @@ const navigateTabs = type => {
 /*
     updateTabIndicator:
 
-    Gives the end user a visual indicator as to their progress through the form by updating the circles at the bottom of the form, with the active tab circle being displayed with a different color to the rest.
+    Gives the end user a visual indicator as to their progress through the form by updating the circles at the bottom 
+    of the form, with the active tab circle being displayed with a different color to the rest.
 */
 const updateTabIndicator = () => {
     // determine how many tabs are in the form and use this to add tab indicators for each
@@ -191,7 +197,9 @@ const updateTabIndicator = () => {
 /*
     addFormRow:
 
-    This takes an elementId as a pass-through variable, this is used to clone the collection of html elements and append to the parent of said element. As this is a clone the html 'id' and 'name' attributes must be updated to maintain their unique values, this is achieved via the changeAttributeValues function.
+    This takes an elementId as a pass-through variable, this is used to clone the collection of html elements and append
+     to the parent of said element. As this is a clone the html 'id' and 'name' attributes must be updated to maintain 
+    their unique values, this is achieved via the changeAttributeValues function.
 */
 const addFormRow = (id, attr = 'id') => {
     const element = document.querySelector(`[${attr}^="${id}"]`);
@@ -231,7 +239,9 @@ const addFormRow = (id, attr = 'id') => {
 /*
     removeFormRow:
 
-    This takes an elementId as a pass-through variable, which is then used to delete the associated html element and all associated children. Once the row is removed, the element attribute values for id and name need to be updated to ensure that any new rows are not created with the same values as the current.
+    This takes an elementId as a pass-through variable, which is then used to delete the associated html element and all
+     associated children. Once the row is removed, the element attribute values for id and name need to be updated to 
+    ensure that any new rows are not created with the same values as the current.
 */
 
 const removeFormRow = elementId => {
@@ -247,7 +257,9 @@ const removeFormRow = elementId => {
             if (countRemainingRows > minRows) {
                 // delete the relevant form row
                 element.remove();
-                // invoke function to iterate through element ID's and names to reindex them so they are in consecutive order with no duplicates
+
+                // invoke function to iterate through element ID's and names to reindex them so they are in consecutive
+                // order with no duplicates
                 elementReindex();
             } else {
                 alert('ERROR: Cannot delete the last form row.');
@@ -263,10 +275,12 @@ const removeFormRow = elementId => {
 /*
     pushValuesToArray:
 
-    This is used by the elementsReindex function to store the details of all the form elements in which the relevant attributes need to be updated. The array is then processed by the processElementReindex function.
+    This is used by the elementsReindex function to store the details of all the form elements in which the relevant 
+    attributes need to be updated. The array is then processed by the processElementReindex function.
 */
 const pushValuesToArray = (array, ref, elementPrefix, elementAttribute, count) => {
-    if (isArray(array) && isString(ref) && isString(elementPrefix) && isString(elementAttribute) && isString(elementAttribute) && isNumber(count)) {
+    if (isArray(array) && isString(ref) && isString(elementPrefix) && isString(elementAttribute) &&
+        isString(elementAttribute) && isNumber(count)) {
         array.push({
             "ref": ref,
             "prefix": elementPrefix,
@@ -284,7 +298,9 @@ const pushValuesToArray = (array, ref, elementPrefix, elementAttribute, count) =
 /*
     elementReindex:
 
-    This loops through the form and captures the values of all form elements with the attributes passed through. It then produces an array of the unique form attributes by only looking at the prefix, this information is then stored in an array and a seperate function (processElementReindex) is called to perform the update.
+    This loops through the form and captures the values of all form elements with the attributes passed through. It then
+    produces an array of the unique form attributes by only looking at the prefix, this information is then stored in an
+    array and a seperate function (processElementReindex) is called to perform the update.
 
     clearElement is used to clear formatting and set the value to empty when adding new form rows
 */
@@ -314,17 +330,20 @@ const elementReindex = (clearElement = false, attributes = ['id', 'name']) => {
                     let elementAttributePrefix = getAttributePrefix(currentElementAttribute);
 
                     let ref = `[${attr}]${elementAttributePrefix}`;
-                    let countOfAttribute = document.getElementById(parentID).querySelectorAll(`[${attr}^=${elementAttributePrefix}]`).length;
+                    let countOfAttribute = document.getElementById(parentID)
+                        .querySelectorAll(`[${attr}^=${elementAttributePrefix}]`).length;
 
                     if (elements.length === 0) {
                         // if there array has no values then set first value
                         pushValuesToArray(elements, ref, elementAttributePrefix, attr, countOfAttribute);
                     } else {
-                        // if array has at least one value then check the array to make sure the current ref is not already contained
+                        // if array has at least one value then check the array to make sure the current ref is not 
+                        // already contained
                         let findRefVal = 0;
                         for (let i = 0; i < elements.length; i++) {
                             if (elements[i]["ref"] === ref) {
-                                // if the current ref ([attribute]elementprefix) is found set the value to 1 which means that the values will NOT be pushed to the array and end the loop
+                                // if the current ref ([attribute]elementprefix) is found set the value to 1 which means
+                                // that the values will NOT be pushed to the array and end the loop
                                 findRefVal = 1;
                                 break;
                             }
@@ -348,7 +367,8 @@ const elementReindex = (clearElement = false, attributes = ['id', 'name']) => {
 /*
     processElementReindex:
 
-    This takes in an array as defined by the elementReindex function. This function then loops through the array and updates the element attribute to the new value to ensure that each form element has a unique name and id.
+    This takes in an array as defined by the elementReindex function. This function then loops through the array and 
+    updates the element attribute to the new value to ensure that each form element has a unique name and id.
 */
 const processElementReindex = (array, clearElement = false) => {
     if (!isArray(array) || array.length === 0) {
@@ -371,7 +391,8 @@ const processElementReindex = (array, clearElement = false) => {
 
                 if (clearElement) {
                     element.value = "";
-                    // remove validation classes (success, fail) and datepicker class to enable initialisation of new datepicker field
+                    // remove validation classes (success, fail) and datepicker class to enable initialisation of new
+                    // datepicker field
                     element.classList.remove('success', 'fail', 'hasDatepicker');
                 }
             }
@@ -448,7 +469,9 @@ const validation = func => {
             const id = element.id;
 
             // form element names are different on the general tab and need to be handled differently
-            const nameStr = getActiveTab().id !== 'general-tab' ? id.slice(id.indexOf('-') + 1, id.lastIndexOf('-')) : element.id.replace(/-/g, ' ');
+            const nameStr = getActiveTab().id !== 'general-tab'
+                ? id.slice(id.indexOf('-') + 1, id.lastIndexOf('-'))
+                : element.id.replace(/-/g, ' ');
 
             const name = nameStr[0].toUpperCase() + nameStr.substr(1).toLowerCase().replace(/-/g, ' ');
 
