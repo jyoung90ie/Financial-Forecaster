@@ -69,10 +69,19 @@ if (form) {
                 const startNw = startingTrans.reduce((acc, val) => acc + val);
                 const endNw = monthlyData[monthlyData.length - 1].nw;
 
-                const differenceNw = endNw - startNw;
+                const differenceNw = (endNw - startNw).toLocaleString();
 
-                outputTxt.innerHTML = `Based on the information you have inputted, your net worth has changed by 
-                ${differenceNw.toLocaleString()}.`;
+                const strStartDate = startDate.toLocaleDateString();
+                const strEndDate = endDate.toLocaleDateString();
+
+                outputTxt.innerHTML = `<p>Based on the information you have inputted, in the period 
+                    (<strong>${strStartDate} - ${strEndDate}</strong>), your net 
+                    worth has changed by <strong>${differenceNw}</strong>.</p>`;
+
+                outputTxt.innerHTML += `<p class="row"><span class="offset-1 col-5">Start Date: ${strStartDate}</span>
+                                        <span class="col-6">Opening Net Worth: ${startNw.toLocaleString()}</span></p>`;
+                outputTxt.innerHTML += `<p class="row"><span class="offset-1 col-5">End Date: ${strEndDate}</span>
+                                        <span class="col-6">Closing Net Worth: ${endNw.toLocaleString()}</span></p>`;
             }
             // add/remove form elements if icons clicked
             if (target.className.includes('fa-plus')) {
