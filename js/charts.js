@@ -2,10 +2,10 @@ const margin = {
     top: 20,
     right: 20,
     bottom: 50,
-    left: 100
+    left: 50
 };
-const graphWidth = 560 - margin.right - margin.left;
-const graphHeight = 360 - margin.top - margin.bottom;
+const graphWidth = 650 - margin.right - margin.left;
+const graphHeight = 500 - margin.top - margin.bottom;
 
 const svg = d3.select('#netWorthChart')
     .append('svg')
@@ -29,7 +29,7 @@ const xAxisGroup = chart.append('g')
 
 const yAxisGroup = chart.append('g')
 
-// used for net worth overall
+// create a line path for user's net worth
 const lineNw = d3.line()
     .x(d => x(new Date(d.date)))
     .y(d => y(parseInt(d.nw)));
@@ -65,8 +65,6 @@ const genChart = (data) => {
         Math.min(d3.min(data, d => parseInt(d.nw)), 0),
         d3.max(data, d => parseInt(d.nw))
     ]);
-
-    console.log(data);
 
 
     // networth line
@@ -106,16 +104,16 @@ const genChart = (data) => {
     const circles = chart.selectAll('circle')
         .data(data);
 
-    // // remove unwanted points
+    // remove unwanted points
     circles.exit().remove();
 
 
-    // // update current points
+    // update current points
     circles
         .attr('cx', d => x(new Date(d.date)))
         .attr('cy', d => y(parseInt(d.nw)));
 
-    // // add new points
+    // add new points
     circles.enter()
         .append('circle')
         .attr('r', 3)
