@@ -1,14 +1,26 @@
 # Financial Scenario Projection
 
-This tool has been created to help you to assess your financial circumstances. It takes your current assets and liabilities (e.g. current account and credit card balances), regular incomes and outgoings, and outputs your financial status at some point in the future (as determined by you).
+This tool has been created to help you to assess your financial circumstances. It takes your current assets and 
+liabilities (e.g. current account and credit card balances), regular incomes and outgoings, and outputs your financial 
+status at some point in the future (as determined by you).
 
-This can be used to perform 'what-if analysis' on your income and outgoings, for example, if you decide to sign-up for a gym membership, you can see the impact of this on your financial health over X time period.
+This can be used to perform 'what-if analysis' on your income and outgoings, for example, if you decide to sign-up for a
+ gym membership, you can see the impact of this on your financial health over X time period.
 
 
 ## UX
 
 The UX has been designed to be simple, intuitive, and make the input experience as fluid as possible. Once a user has 
 completed the form atleast once the data will be saved, enabling them to quickly go back and forward between tabs.
+
+The UI was designed using Bootstrap so that I could make use of the responsive framework for my data capture form. CSS 
+transitions were added to give the user a feel for the direction of travel through the data capture process. A visual 
+indicator was also added to the bottom of the form so the user knows where they are in the data capture process.
+
+The net worth chart produced at the end uses the D3.js line path generator with circles overlaid. This was designed to 
+guide the end user to the data points (i.e. the circles), so that when they hover over each a tooltip will be shown that 
+provides further information. This chart is contained within a horizontal scrollable div, enabling it to be viewed 
+correctly on smaller devices.
 
 For example, a user wants to understand what the impact on their savings will be over a 3 year period if they reduce 
 their TV and Internet Bill by 23/month.
@@ -40,7 +52,8 @@ on their progress through the form
 add a new row for data capture (e.g. a new account). This ensures the data inputs are of a minimum standard before 
 processing
 - Time-series data - from the user inputs a time-series data array is created over the user specified time period
-- Net Worth - the time-series data is used to output the user's net worth information over time. For example the user can determine their net worth at the point-in-time X, not just at the end of the time period.
+- Net Worth - the time-series data is used to output the user's net worth information over time. For example the user 
+can determine their net worth at the point-in-time X, not just at the end of the time period.
 - Net Worth Chart - Using D3.js a chart is produced showing the evolution of the user's net worth over the time 
 period specified.
 
