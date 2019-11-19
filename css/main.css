@@ -238,3 +238,10 @@ input[readonly] {
 .circle {
     stroke: #0D1B2A;
 }
+
+
+/* let the d3 chart div be scrollable on smaller devices */
+#netWorthChart {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+}
