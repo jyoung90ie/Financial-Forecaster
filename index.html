@@ -22,14 +22,41 @@
 				<p>This tool has been designed to help you project your current finances and determine where you will be
 					at the end of a specified time period.</p>
 				<p>In order to do this a number of user inputs are required. Namely, current savings and debt, regular
-					income and outgoings, and a start and end date.</p>
+					income and outgoings, and, a start and end date.</p>
+				<p>For example, a user wants to understand what the impact on their savings will be over a 3 year period
+					if they reduce
+					their TV and Internet Bill by 23/month.
+					<ul>
+						<li>The user populates the form with the following data:</li>
+						<ol>
+							<li>Personal Data, selecting the goal to 'Increase Savings'</li>
+							<li>Current Assets and Liabilities (i.e. account balances)</li>
+							<li>Income(s) with frequency (e.g. monthly)</li>
+							<li>Outgoing(s) with frequency (e.g. weekly) - including the TV and Internet bill at the
+								current price</li>
+							<li>Submits the data and is presented with a visual representation of their net worth
+								over time</li>
+						</ol>
+						<br>
+						<li>To then determine the impact of this change in outgoings, the user then does the following:
+						</li>
+						<ol start="6">
+							<li>Clicks the 'Previous' button until they reach the 'Regular Outgoing(s)' tabs</li>
+							<li>Updates the 'TV and Internet' bill to the new price</li>
+							<li>Submits the data again and is now presented with their net worth over time</li>
+							<li>Comparing the outputted values to those outputted at Step 5 gives the impact of
+								reducing this bill</li>
+						</ol>
+					</ul>
+				</p>
 				<p>To get started please click next and input the requested data. Should you require additional input
 					fields, you can add and remove as necessary on the relevant input pages.</p>
 			</section>
 			<section id="general-tab" class="hide">
 				<h2><i class="fas fa-user-circle"></i> Personal Details</h2>
 				<div class="form-row">
-					<p>Please input your contact details and select a start and end date for your forecasting. </p>
+					<p>Please input your contact details, and, select a start and end date for the forecasting period.
+					</p>
 				</div>
 				<div class="form-row">
 					<div class="form-group col-12 col-md-6">
@@ -68,8 +95,9 @@
 				<section id="account-tab" class="hide">
 					<h2><i class="fas fa-credit-card"></i> Accounts</h2>
 					<div class="form-row">
-						<p>Please enter all of your bank accounts, loans, credit card accounts, etc., and the current
-							balance of each as they are today.</p>
+						<p>Please enter all of your opening balances (e.g. for accounts, loans, credit cards, etc.) that
+							you are including as part of the forecasting. Please ensure they align with the start date
+							you have selected.</p>
 					</div>
 					<div id="account-fields-1" class="form-row">
 						<div class="form-group col-12 col-lg-4">
@@ -108,12 +136,10 @@
 					<h2><i class="fas fa-piggy-bank"></i> Regular Income</h2>
 					<div class="form-row">
 						<p>Please enter any regular income transactions you have, inputting the
-							estimated amount and how often they take place.</p>
+							actual (or estimated) amount and how often each takes place.</p>
 						<p><strong>Please note:</strong> all one-off transactions will take place 14 days after the
-							start date. All
-							recurring transactions will take place as per the frequency selected - the start date will
-							act
-							as time zero.</p>
+							start date. All recurring transactions will take place as per the frequency selected - the
+							start date will act as time zero.</p>
 					</div>
 					<div id="income-fields-1" class="form-row mt-3 mt-md-0">
 						<div class="form-group col-12 col-md-4 col-lg-5">
@@ -157,12 +183,10 @@
 					<h2><i class="fas fa-shopping-basket"></i> Regular Outgoing(s)</h2>
 					<div class="form-row">
 						<p>Please enter any regular outgoing transactions you have, inputting the
-							estimated amount and how often they take place.</p>
+							actual (or estimated) amount and how often each takes place.</p>
 						<p><strong>Please note:</strong> all one-off transactions will take place 14 days after the
-							start date. All
-							recurring transactions will take place as per the frequency selected - the start date will
-							act
-							as time zero.</p>
+							start date. All recurring transactions will take place as per the frequency selected - the
+							start date will act as time zero.</p>
 					</div>
 					<div id="outgoing-fields-1" class="form-row mt-3 mt-md-0">
 						<div class="form-group col-12 col-md-7">

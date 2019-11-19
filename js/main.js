@@ -1,9 +1,15 @@
-const minRows = 1; // minimum total number of form rows
-const maxRows = 12; // maximum total number of form rows
-const startTab = 0; // first tab = 0
+/*
+    This is used to bring all the functionality together via the use of a form event listener.
 
+    All settings values are created here.
+*/
+
+const minRows = 1; // minimum total number of form rows  - applies to accounts, income, and outgoing tabs.
+const maxRows = 12; // maximum total number of form rows - applies to accounts, income, and outgoing tabs.
+const startTab = 0; // first tab = 0 - enables the user to specify which tab should be displayed upon opening
 const tabIdentifier = 'tab'; // word which identifies all tabs
 
+// capture html elements as js variables
 const prevBtn = document.getElementById('prev-btn');
 const nextBtn = document.getElementById('next-btn');
 const submitBtn = document.getElementById('submit-btn');
@@ -78,10 +84,14 @@ if (form) {
                     (<strong>${strStartDate} - ${strEndDate}</strong>), your net 
                     worth has changed by <strong>${differenceNw}</strong>.</p>`;
 
-                outputTxt.innerHTML += `<p class="row"><span class="offset-1 col-5">Start Date: ${strStartDate}</span>
-                                        <span class="col-6">Opening Net Worth: ${startNw.toLocaleString()}</span></p>`;
-                outputTxt.innerHTML += `<p class="row"><span class="offset-1 col-5">End Date: ${strEndDate}</span>
-                                        <span class="col-6">Closing Net Worth: ${endNw.toLocaleString()}</span></p>`;
+                outputTxt.innerHTML += `<p class="row">
+                                            <span class="offset-1 col-5">Start Date: ${strStartDate}</span>
+                                            <span class="col-5">End Date: ${strEndDate}</span>
+                                        </p>`;
+                outputTxt.innerHTML += `<p class="row">
+                                            <span class="offset-1 col-5">Opening Net Worth: ${startNw.toLocaleString()}</span>
+                                            <span class="col-5">Closing Net Worth: ${endNw.toLocaleString()}</span>
+                                        </p>`;
             }
             // add/remove form elements if icons clicked
             if (target.className.includes('fa-plus')) {
