@@ -5,14 +5,14 @@
 
 // stores the html element of the current form tab that the user can see
 const getActiveTab = () => {
-    let tab = document.querySelector(`section[id*="${tabIdentifier}"]:not(.hide)`);;
+    let tab = document.querySelector(`section[id*="${tabIdentifier}"]:not(.hide)`);
 
     if (tab) {
         return tab;
     }
 
     return false;
-}
+};
 
 // stores all of the form tabs in a variable
 const getTabs = () => {
@@ -23,7 +23,7 @@ const getTabs = () => {
     }
 
     return false;
-}
+};
 
 // variable type checks
 const isNumber = val => {
@@ -341,7 +341,7 @@ const elementReindex = (clearElement = false, attributes = ['id', 'name']) => {
                         // already contained
                         let findRefVal = 0;
                         for (let i = 0; i < elements.length; i++) {
-                            if (elements[i]["ref"] === ref) {
+                            if (elements[i].ref === ref) {
                                 // if the current ref ([attribute]elementprefix) is found set the value to 1 which means
                                 // that the values will NOT be pushed to the array and end the loop
                                 findRefVal = 1;
@@ -377,13 +377,13 @@ const processElementReindex = (array, clearElement = false) => {
     }
 
     for (let i = 0; i < array.length; i++) {
-        let attr = array[i]["attribute"];
-        let attributePrefix = array[i]["prefix"];
+        let attr = array[i].attribute;
+        let attributePrefix = array[i].prefix;
         let elements = document.querySelectorAll(`[${attr}^="${attributePrefix}"]`);
 
         elements.forEach(element => {
             let currentAttributeName = element[attr];
-            let attributeCurrent = array[i]["current"];
+            let attributeCurrent = array[i].current;
             let newAttributeName = attributePrefix + attributeCurrent;
 
             if (currentAttributeName !== newAttributeName) {
@@ -396,7 +396,7 @@ const processElementReindex = (array, clearElement = false) => {
                     element.classList.remove('success', 'fail', 'hasDatepicker');
                 }
             }
-            array[i]["current"]++;
+            array[i].current++;
         });
     }
 };
@@ -426,7 +426,7 @@ const getScalar = frequency => {
             break;
         default:
             yearScalar = 1;
-    };
+    }
     return yearScalar;
 };
 
@@ -436,7 +436,7 @@ const validateText = text => {
         return false;
     }
 
-    const pattern = /^[a-zA-Z0-9 *&-\[\]\{\}\(\)]{1,30}$/
+    const pattern = /^[a-zA-Z0-9 *&-\[\]\{\}\(\)]{1,30}$/;
     return pattern.test(text);
 };
 
@@ -446,7 +446,7 @@ const validateNumber = text => {
         return false;
     }
 
-    const pattern = /^-?[0-9]+(\.[0-9][0-9]?)?$/
+    const pattern = /^-?[0-9]+(\.[0-9][0-9]?)?$/;
     return pattern.test(text);
 };
 
@@ -469,9 +469,9 @@ const validation = func => {
             const id = element.id;
 
             // form element names are different on the general tab and need to be handled differently
-            const nameStr = getActiveTab().id !== 'general-tab'
-                ? id.slice(id.indexOf('-') + 1, id.lastIndexOf('-'))
-                : element.id.replace(/-/g, ' ');
+            const nameStr = getActiveTab().id !== 'general-tab' ?
+                id.slice(id.indexOf('-') + 1, id.lastIndexOf('-')) :
+                element.id.replace(/-/g, ' ');
 
             const name = nameStr[0].toUpperCase() + nameStr.substr(1).toLowerCase().replace(/-/g, ' ');
 
@@ -489,7 +489,7 @@ const validation = func => {
                     element.classList.add('fail');
                     fails++;
 
-                    errorHTML += `<li>You must input a valid email address.</li>`
+                    errorHTML += `<li>You must input a valid email address.</li>`;
                 } else if (id.includes('amount') && isNaN(value)) {
                     element.classList.add('fail');
                     fails++;
@@ -541,14 +541,14 @@ const validation = func => {
     resetErrorMsg: used to hide the error message container and remove the content
 */
 const resetErrorMsg = () => {
-    if (error) {
-        error.classList.add('hide');
-        error.innerHTML = '';
-
-        return true;
+    if (typeof error == 'undefined' || error === null) {
+        return false;
     }
 
-    return false;
+    error.classList.add('hide');
+    error.innerHTML = '';
+
+    return true;
 };
 
 /*

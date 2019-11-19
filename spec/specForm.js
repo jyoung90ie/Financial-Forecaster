@@ -173,10 +173,6 @@ describe("Form functionality", () => {
         it("check that this returns false when 'error' does not exist", () => {
             expect(resetErrorMsg()).toBe(false);
         });
-        let error = '';
-        it("check that this returns false when 'error' does not exist", () => {
-            expect(resetErrorMsg()).toBe(false);
-        });
     });
 
 

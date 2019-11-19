@@ -27,7 +27,7 @@ const y = d3.scaleLinear()
 const xAxisGroup = chart.append('g')
     .attr('transform', `translate(0, ${graphHeight})`);
 
-const yAxisGroup = chart.append('g')
+const yAxisGroup = chart.append('g');
 
 // create a line path for user's net worth
 const lineNw = d3.line()
@@ -133,4 +133,4 @@ const genChart = (data) => {
         });
 
 
-}
+};

@@ -71,8 +71,8 @@ const createDataArray = inputData => {
                     j++;
                 }
                 outputData[j] = {};
-                outputData[j]['ref'] = curRef;
-                outputData[j]['source'] = source;
+                outputData[j].ref = curRef;
+                outputData[j].source = source;
             }
 
             if (fieldName.includes('amount')) {
@@ -103,15 +103,16 @@ const numberFormat = num => {
 const updateDataArray = (dataArray, ref, date, amount, description, type) => {
     dataArray.push({ ref, date, amount, description, type });
     return dataArray;
-}
+};
 
 
 const genMonthlyData = (inputData, startDate, endDate) => {
     // calculate the number of days between the start and end dates
     const dayTime = 24 * 60 * 60 * 1000; // milliseconds in a day
-    const amountOfDays = (endDate.getTime() - startDate.getTime()) / (dayTime) // number of days between two dates, this is used as number of iterations    
+    const amountOfDays = (endDate.getTime() - startDate.getTime()) / (dayTime);  // number of days between two dates, this is used as number of iterations    
 
-    const liabilities = ['liability', 'cc', 'outgoing']; // if inputData source or type contains any of these then the amount should be negative
+    // if inputData source or type contains any of these then the amount should be negative
+    const liabilities = ['liability', 'cc', 'outgoing']; 
 
     let dataArray = [];
     let nw = 0;
@@ -128,8 +129,8 @@ const genMonthlyData = (inputData, startDate, endDate) => {
         let date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()).getTime();
 
         /* if the ref/type indicates this is an outgoing amount and the input amount is positive, transfer to negative amount */
-        if (liabilities.includes(source) || liabilities.includes(type)
-            && amount > 0) {
+        if (liabilities.includes(source) || liabilities.includes(type) &&
+            amount > 0) {
             // check that the user hasn't already input the number as a negative
             amount = -1 * amount;
         }
@@ -167,7 +168,7 @@ const genMonthlyData = (inputData, startDate, endDate) => {
         let curDate;
         let daysSinceUpdate;
 
-        for (i = 1; i < amountOfDays + 1; i++) {
+        for (let day = 1; day < amountOfDays + 1; day++) {
             if (curDate === undefined) {
                 // first time this item has been entered
                 // first entry date will be on (1 month - 1 day) after the start date
@@ -187,7 +188,7 @@ const genMonthlyData = (inputData, startDate, endDate) => {
                     daysSinceUpdate += 1; // increment days counter
                 }
             }
-        };
+        }
     });
 
     // sort array by date
@@ -203,7 +204,7 @@ const genMonthlyData = (inputData, startDate, endDate) => {
             ref: d.ref,
             type: d.type,
             nw: nw
-        }
+        };
     });
 
     return outputData;
@@ -282,5 +283,5 @@ const retrieveData = () => {
         if (element) {
             element.value = item.value;
         }
-    })
+    });
 };
