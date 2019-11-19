@@ -78,10 +78,10 @@ const initTab = (startTab = 0) => {
     let maxTab = numberOfTabs - 1;
 
     if (startTab > maxTab) {
-        console.log(`ERROR: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(${maxTab}).`);
+        console.log(`WARNING: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(${maxTab}).`);
         startTab = maxTab;
     } else if (startTab < 0) {
-        console.log(`ERROR: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(0).`);
+        console.log(`WARNING: initTab function called for (tab: ${startTab}) which does not exist. Defaulting to tab(0).`);
         startTab = 0;
     }
 
