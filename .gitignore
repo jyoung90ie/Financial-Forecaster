@@ -1,0 +1,4 @@
+node_modules/
+.gitpod*
+package-lock.json
+.theia/

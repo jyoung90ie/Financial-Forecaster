@@ -1,97 +1,137 @@
-function navigateTabs(type) {
-    var activeTab = document.querySelectorAll('section[id*="tab-"]:not(.hide)')[0];
-    var arrayOfTabs = document.querySelectorAll('section[id*="tab-"]');
+/*
+    This is used to bring all the functionality together via the use of a form event listener.
 
-    arrayOfTabs.forEach(function (item, index) {
+    All settings values are created here.
+*/
 
-        var currentTabNumber = index + 1; // need to add one as first array item has index of 0
-        var numberOfTabs = arrayOfTabs.length;
+const minRows = 1; // minimum total number of form rows  - applies to accounts, income, and outgoing tabs.
+const maxRows = 12; // maximum total number of form rows - applies to accounts, income, and outgoing tabs.
+const startTab = 0; // first tab = 0 - enables the user to specify which tab should be displayed upon opening
+const tabIdentifier = 'tab'; // word which identifies all tabs
+
+// capture html elements as js variables
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const submitBtn = document.getElementById('submit-btn');
+const form = document.querySelector('form');
+const summaryTab = document.querySelector('#summary-tab');
+const progressIndicator = document.querySelector('#progress-indicator');
+const contentBox = document.querySelector('.content-box');
+const error = document.querySelector('#error-messages');
+const outputTxt = document.querySelector('.summary-txt');
+
+let startDate, endDate;
+/*******************************
+  event listener used to determine what was clicked on the form
+*******************************/
+if (form) {
+    form.addEventListener('click', event => {
+
+        const activeTab = getActiveTab();
+        const target = event.target;
+
+        // dates are captured in the format mm-dd-yyyy and need to be converted
+        const fStartDate = document.querySelector('#start-date').value;
+        const fEndDate = document.querySelector('#end-date').value;
+
+        if (fStartDate && fEndDate) {
+            // convert html inputs to js dates
+            startDate = fStartDate.split("/");
+            endDate = fEndDate.split("/");
+
+            startDate = new Date(startDate[2], startDate[1] - 1, startDate[0]);
+            endDate = new Date(endDate[2], endDate[1] - 1, endDate[0]);
+        }
 
 
+        if (target.hasAttribute('class') || target.hasAttribute('id')) {
+            // navigation button actions
+            if (target.id === 'prev-btn') {
+                navigateTabs('prev');
+            } else if (target.id === 'next-btn') {
+                // validation
+                validation(() => navigateTabs('next'));
 
-        // console.log(item.id + ": index[" + currentTabNumber + "]");
-        // console.log("current tab: " + item.id + " - active tab: " + activeTab.id);
+            } else if (target.id === 'submit-btn') {
+                event.preventDefault(); // do not refresh form
 
-        // loop through all elements that match query selector and only continue for the current active tab
-        if (item.id === activeTab.id) {
-            if (type === 'next') {
-                arrayOfTabs[index + 1].classList.remove("hide");
-                var adjTabNumber = currentTabNumber + 1;
-            } else if (type === 'prev') {
-                arrayOfTabs[index - 1].classList.remove("hide");
-                var adjTabNumber = currentTabNumber - 1;
-            } else {
-                console.log('ERROR: Function argument "type" value is not accepted.');
+                // create an array of form element names by removing any without a name
+                const elementNames = getElements(form);
+
+                // split formdata array into specific arrays using function
+                const formData = createDataArray(elementNames);
+                const monthlyData = genMonthlyData(formData, startDate, endDate);
+
+                // transition to the next tab to show results
+                validation(() => navigateTabs('next'));
+
+                // produce networth chart using d3
+                genChart(monthlyData);
+
+                // create an array with only the value amounts for transactions that take place on the start date
+                const startingTrans = monthlyData.filter(d => d.date == monthlyData[0].date).map(d => d.amount);
+
+                // sum the amounts from startingTrans to produce opening net worth figure
+                const startNw = startingTrans.reduce((acc, val) => acc + val);
+                const endNw = monthlyData[monthlyData.length - 1].nw;
+
+                const differenceNw = (endNw - startNw).toLocaleString();
+
+                const strStartDate = startDate.toLocaleDateString();
+                const strEndDate = endDate.toLocaleDateString();
+
+                outputTxt.innerHTML = `<p>Based on the information you have inputted, in the period 
+                    (<strong>${strStartDate} - ${strEndDate}</strong>), your net 
+                    worth has changed by <strong>${differenceNw}</strong>.</p>`;
+
+                outputTxt.innerHTML += `<p class="row">
+                                            <span class="offset-1 col-5">Start Date: ${strStartDate}</span>
+                                            <span class="col-5">End Date: ${strEndDate}</span>
+                                        </p>`;
+                outputTxt.innerHTML += `<p class="row">
+                                            <span class="offset-1 col-5">Opening Net Worth: ${startNw.toLocaleString()}</span>
+                                            <span class="col-5">Closing Net Worth: ${endNw.toLocaleString()}</span>
+                                        </p>`;
             }
+            // add/remove form elements if icons clicked
+            if (target.className.includes('fa-plus')) {
+                // append new row
 
-            activeTab.classList.add("hide");
+                // find the first parent div with an id attribute
+                const parentID = getTargetNodeID(target, 'DIV');
+                validation(() => addFormRow(parentID));
 
-            // buttons to be displayed are based on what the next tab is, i.e. if I clicked the next button whilst on tab 1, then I need to consider what buttons should be shown based on tab 2 - hence adjTabNumber accounts for this
-            if (adjTabNumber === 1) {
-                document.getElementById('prev-btn').classList.add('hide');
-                document.getElementById('next-btn').classList.remove('hide');
-            } else if (adjTabNumber > 1 && adjTabNumber < numberOfTabs) {
-                // show next and previous
-                document.getElementById('prev-btn').classList.remove('hide');
-                document.getElementById('next-btn').classList.remove('hide');
-            } else if (adjTabNumber === numberOfTabs) {
-                // show prev only
-                document.getElementById('prev-btn').classList.remove('hide');
-                document.getElementById('next-btn').classList.add('hide');
-            } else {
-                // show prev only
-                document.getElementById('prev-btn').classList.remove('hide');
-                document.getElementById('next-btn').classList.add('hide');
+            } else if (target.className.includes('fa-trash-alt')) {
+                // remove clicked row
+
+                // find the first parent div with an id attribute
+                const parentID = getTargetNodeID(target, 'DIV');
+                removeFormRow(parentID);
+
+                // call validation again to refresh error messages (or remove if no longer applicable), 
+                // pass an empty callback function
+                validation(() => { });
             }
-
-
         }
     });
-    // var activeTabPosition = numberOfTabs.indexOf(activeTab);
-    // console.log(activeTab);
-    // console.log(numberOfTabs);
-    // console.log(activeTabPosition);
-
-
-
-    // for (var currentElement = element; currentElement !== document && currentElement; currentElement = currentElement.parentNode) {
-
-    //     if (currentElement.id.startsWith('tab-')) {
-    //         var currentTabParent = currentElement;
-
-    //         for (var nextElement = currentElement.nextElementSibling; nextElement !== document && nextElement; nextElement = nextElement.nextElementSibling) {
-    //             if (nextElement.id.startsWith('tab-')) {
-    //                 var nextTabParent = nextElement;
-    //                 break; // exit the loop
-    //             }
-    //         }
-    //         break; // stop the loop once value found
-    //     }
-    // }
-
-    // // var strPosition = currentTabId.lastIndexOf('-') + 1; // adding one as I want the character after the '-'
-
-    // var nextTabId = 'tab-' + (parseInt(currentTabId.substr(strPosition, 1)) + 1); // take the current tab value and increment it by one to get next tab value
-
-    // currentTabParent.classList.add("hide");
-    // nextTabParent.classList.remove("hide");
 }
 
-function findAllTabs() {
-    var activeTabParent = document.querySelectorAll('section[id^="tab-"]:not(.hide)')[0];
-    var numberOfTabs = document.querySelectorAll('section[id^="tab-"]').length;
-
-    var strPos = activeTabParent.id.lastIndexOf('-') + 1;
 
 
-    var activeTabNumber = activeTabParent.id.substr(strPos, 1);
+// datepicker format
+let dFormat = 'dd/mm/yy';
 
-    console.log("Active tab: " + activeTabParent.id);
-    console.log("Number of tabs: " + numberOfTabs);
-    console.log("Tab: " + activeTabNumber + " of " + numberOfTabs);
-    // console.log(document.querySelectorAll('<*(id="*tab-.*")*!(hide)>'));
-}
+// initialise datepicker if input field has class 'datepicker'
+$(document).ready(function () {
+    $(document).on("focus", ".datepicker", function () {
+        $(this).datepicker();
+    });
+});
 
-// window.onload = function () {
-//     findAllTabs();
-// }
+$.datepicker.setDefaults({
+    dateFormat: dFormat,
+    changeMonth: true,
+    changeYear: true
+});
+
+initTab(startTab);

@@ -1,18 +1,247 @@
-.container {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
+body {
+    background-color: #E0E1DD;
+    color: #E0E1DD;
 }
 
 .content-box {
+    height: 100%;
+    min-height: 500px;
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #778DA9;
+    position: relative;
+    border-radius: 15px;
+    border: 2px solid #415A77;
+    display: inline-block;
     width: 100%;
-    height: auto;
-    background-color: rgba(0, 0, 0, 0.2);
-    border-radius: 8px;
-    border: solid grey 1px;
-    margin: auto;
+}
+
+section {
+    background-color: #778DA9;
+}
+
+.far,
+.fas {
+    color: #2A3A4C;
+}
+
+a .far:hover,
+a .fas:hover {
+    color: #E0E1DD;
+}
+
+.table {
+    color: #0D1B2A;
+}
+
+td {
+    border-color: #1B263B !important;
+}
+
+.table thead {
+    color: #E0E1DD;
+    background-color: #1B263B;
+}
+
+.btn-primary {
+    background-color: #3C526D;
+    border: 0;
+}
+
+.btn-primary:hover {
+    background-color: #2A3A4C;
+    border: 0;
 }
 
 .hide {
     display: none;
+}
+
+/* transitions to make the UX more natural */
+
+.slide-in-left {
+    animation: slide-in-left 1s forwards;
+    -webkit-animation: slide-in-left 0.5s forwards;
+}
+
+.slide-in-right {
+    animation: slide-in-right 1s backwards;
+    -webkit-animation: slide-in-right 0.5s backwards;
+}
+
+@keyframes slide-in-left {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateX(0%);
+    }
+}
+
+@-webkit-keyframes slide-in-left {
+    0% {
+        -webkit-transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: translateX(0%);
+    }
+}
+
+@keyframes slide-in-right {
+    0% {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes slide-in-right {
+    0% {
+        -webkit-transform: translateX(100%);
+        opacity: 0;
+    }
+
+    50% {
+        opacity: 0.2;
+    }
+
+    100% {
+        opacity: 1;
+        -webkit-transform: translateX(0%);
+    }
+}
+
+h2 {
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid #0D1B2A;
+    color: #fff;
+}
+
+h2>.fas,
+h2>.far {
+    padding-right: 10px;
+}
+
+.input-end {
+    border-bottom: 1px dotted #0D1B2A;
+
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+/* format the datepicker fields the same as the other form fields */
+input[readonly] {
+  background-color: white  !important;
+}
+
+#navigation {
+    float: right;
+}
+
+.add-remove-btns {
+    font-size: 21px;
+}
+
+.tab {
+    height: 13px;
+    width: 13px;
+    border-radius: 50%;
+    border: none;
+    background-color: #415A77;
+    display: inline-block;
+    margin-right: 8px;
+}
+
+.tab.active {
+    background-color: #E0E1DD;
+}
+
+
+.success {
+    border: 2px solid green;
+}
+
+.fail {
+    border: 2px solid red;
+}
+
+#progress-indicator {
+    position: absolute;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#navigation {
+    padding-bottom: 10px;
+}
+
+/* d3 chart styling */
+
+.tooltip {
+    opacity: 0.5;
+    background-color: #0D1B2A;
+    padding: 5px 10px 5px 10px;
+    font-size: 12px;
+    border-radius: 15px;
+    
+}
+
+.tooltip .header {
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 1px dashed #ccc;
+    margin: 2px 0 4px 0;
+}
+
+.tooltip .body {
+    margin-left: 4px;
+    line-height: 2;
+}
+
+.tooltip .footer {
+    padding: 0;
+    margin: 4px 0 2px 0;
+    border-top: 1px dashed #ccc;
+    font-size: 13px;
+}
+
+.line {
+    fill: none;
+    stroke: #0D1B2A;
+    stroke-width: 2;
+}
+
+.circle {
+    stroke: #0D1B2A;
+}
+
+
+/* let the d3 chart div be scrollable on smaller devices */
+#netWorthChart {
+    flex-wrap: nowrap;
+    overflow-x: auto;
 }
